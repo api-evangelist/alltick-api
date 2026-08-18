@@ -1,0 +1,121 @@
+generated: '2026-08-18'
+method: derived
+source: openapi/alltick-api-openapi.json
+checked: '2026-08-18'
+status: candidate
+summary: >-
+  AllTick ships no MCP server. No hosted/remote endpoint is published on any AllTick host, nothing
+  in the docs, llms.txt or the two AllTick GitHub accounts mentions MCP, and the two npm packages
+  that expose AllTick data over MCP are third-party or unverifiable (see packages/). The tools below
+  are a CANDIDATE surface derived one-to-one from the 12 operations in AllTick's own OpenAPI 3.1.0 —
+  they are a proposal to AllTick, not something an agent can call today.
+deployment:
+  mode: none
+  endpoint: null
+  install: null
+  package: null
+  auth: api-key
+  verified: derived
+  note: >-
+    auth records the model a server WOULD need (AllTick's `token` query parameter), not a live
+    server's auth. No endpoint URL is guessed: none is published.
+searched:
+  - what: hosted MCP endpoint on provider hosts
+    result: none found
+    probed:
+      - url: https://alltick.co/.well-known/ai-plugin.json
+        status: 404
+      - url: https://alltick.co/.well-known/agent-card.json
+        status: 404
+      - url: https://en.apis.alltick.co/.well-known/agent-card.json
+        status: 404
+  - what: MCP mention in provider docs
+    result: none
+    note: >-
+      Zero matches for "mcp", "model context protocol" or "agent" across
+      https://en.apis.alltick.co/llms.txt (79 documented pages) and the alltick/docs repository.
+  - what: npm/registry MCP packages
+    result: 2 found, neither first-party
+    detail: >-
+      alltick-agent (unverified, personal npm account, README points at an unpublished @alltick/agent)
+      and alltick-stock-mcp-server (explicitly "based on the AllTick data source"). See
+      packages/alltick-api-packages.yml.
+surfaces:
+  openapi: openapi/alltick-api-openapi.json
+  live_openapi: https://apis.alltick.co/api-reference/openapi.json
+  base_url: https://quote.alltick.co
+  websocket:
+    - wss://quote.alltick.co/quote-stock-b-ws-api
+    - wss://quote.alltick.co/quote-b-ws-api
+tools:
+  - name: get_stock_kline
+    description: Historical / latest candlesticks for one Hong Kong, US or A-share stock code.
+    rest: getStockKline
+    method: GET
+    path: /quote-stock-b-api/kline
+    inputSchema_source: openapi parameters (token, query)
+  - name: get_market_kline
+    description: Historical / latest candlesticks for one forex, crypto or commodity code.
+    rest: getForexKline
+    method: GET
+    path: /quote-b-api/kline
+  - name: get_stock_batch_kline
+    description: Latest 2 candlesticks for many stock codes and candlestick types in one call.
+    rest: postStockBatchKline
+    method: POST
+    path: /quote-stock-b-api/batch-kline
+  - name: get_market_batch_kline
+    description: Latest 2 candlesticks for many forex/crypto/commodity codes in one call.
+    rest: postForexBatchKline
+    method: POST
+    path: /quote-b-api/batch-kline
+  - name: get_stock_order_book
+    description: Current market depth (order book) for a list of stock codes.
+    rest: getStockDepthTick
+    method: GET
+    path: /quote-stock-b-api/depth-tick
+  - name: get_market_order_book
+    description: Current market depth (order book) for a list of forex/crypto/commodity codes.
+    rest: getForexDepthTick
+    method: GET
+    path: /quote-b-api/depth-tick
+  - name: get_stock_last_trade
+    description: Latest transaction price (tick) for a list of stock codes.
+    rest: getStockTradeTick
+    method: GET
+    path: /quote-stock-b-api/trade-tick
+  - name: get_market_last_trade
+    description: Latest transaction price (tick) for a list of forex/crypto/commodity codes.
+    rest: getForexTradeTick
+    method: GET
+    path: /quote-b-api/trade-tick
+  - name: get_stock_static_info
+    description: Static instrument reference data for a list of US/HK/A-share codes.
+    rest: getStockStaticInfo
+    method: GET
+    path: /quote-stock-b-api/static_info
+  - name: list_sse_suspensions
+    description: Paged list of Shanghai Stock Exchange trading halts and resumptions.
+    rest: getSseSuspension
+    method: GET
+    path: /api/suspension/sse
+  - name: list_nyse_suspensions
+    description: Paged list of NYSE trading halts and resumptions.
+    rest: getNyseSuspension
+    method: GET
+    path: /api/suspension/nyse
+  - name: list_nasdaq_suspensions
+    description: Paged list of NASDAQ trading halts and resumptions.
+    rest: getNasdaqSuspension
+    method: GET
+    path: /api/suspension/nasdaq
+not_derivable_from_rest:
+  - name: subscribe_trade_stream
+    reason: >-
+      Real-time tick and order-book push are WebSocket-only (cmd_id 22004/22002, push 22998/22999).
+      A streaming subscription has no REST operation to bind to and is not expressible as a
+      request/response MCP tool.
+coverage:
+  openapi_operations: 12
+  tools_derived: 12
+  tools_shipped_by_provider: 0

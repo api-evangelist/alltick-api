@@ -1,0 +1,69 @@
+generated: '2026-08-18'
+method: probed
+source: live GET probes of /.well-known/* on every AllTick host
+checked: '2026-08-18'
+summary: >-
+  AllTick serves no /.well-known documents on any host. The marketing/dashboard host (alltick.co)
+  returns a genuine nginx 404 for every path, the API host (quote.alltick.co) answers every path —
+  including /.well-known/* — with its own JSON auth gate ({"msg":"token is required","ret":401}),
+  and the docs host (en.apis.alltick.co) is a Next.js/Mintlify SPA that returns its 404 shell.
+  No security.txt, no OpenID/OAuth metadata, no api-catalog, no ai-plugin.json.
+hosts:
+  - host: alltick.co
+    paths:
+      - path: /.well-known/security.txt
+        status: 404
+        file: null
+      - path: /.well-known/openid-configuration
+        status: 404
+        file: null
+      - path: /.well-known/oauth-authorization-server
+        status: 404
+        file: null
+      - path: /.well-known/api-catalog
+        status: 404
+        file: null
+      - path: /.well-known/ai-plugin.json
+        status: 404
+        file: null
+      - path: /.well-known/agent-card.json
+        status: 404
+        file: null
+      - path: /.well-known/agent.json
+        status: 404
+        file: null
+  - host: quote.alltick.co
+    note: >-
+      Every path on the API host returns HTTP 401 with the body {"msg":"token is required","trace":"","ret":401}.
+      This is the token gate, not a served document — treat as a miss.
+    paths:
+      - path: /.well-known/security.txt
+        status: 401
+        file: null
+      - path: /.well-known/agent-card.json
+        status: 401
+        file: null
+      - path: /.well-known/agent.json
+        status: 401
+        file: null
+  - host: en.apis.alltick.co
+    note: >-
+      Next.js SPA docs host; 404 responses carry a ~182KB HTML error shell, not a document.
+    paths:
+      - path: /.well-known/security.txt
+        status: 404
+        file: null
+      - path: /.well-known/api-catalog
+        status: 404
+        file: null
+      - path: /.well-known/agent-card.json
+        status: 404
+        file: null
+      - path: /.well-known/agent.json
+        status: 404
+        file: null
+files: []
+pointer_emitted: false
+pointer_note: >-
+  No WellKnown, SecurityTxt or AgentCard pointer is emitted in apis.yml. Every probed path missed,
+  and a pointer would assert that AllTick serves a /.well-known surface that it does not.

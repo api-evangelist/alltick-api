@@ -1,0 +1,104 @@
+generated: '2026-08-18'
+method: searched
+source: https://alltick.co/pricing
+docs: https://alltick.co/pricing
+checked: '2026-08-18'
+plan_count: 8
+currency: USDT
+billing_period: month
+summary: >-
+  AllTick publishes a full, self-serve price list in USDT (a stablecoin, not fiat) with no
+  "contact sales" tier. Four capacity tiers (Free/Basic/Premium/Professional) sell a chosen basket
+  of symbols; three market tiers sell an entire exchange's book. Symbol count, request rate,
+  WebSocket connections and historical depth all scale together with price.
+notes:
+  - Prices are quoted per month in USDT.
+  - >-
+    The Free tier is not a time-limited trial of the paid product: it is a permanent tier locked to
+    10 fixed demo symbols with end-of-day data only (no real-time candlesticks, no order book, no
+    tick-by-tick). AllTick's FAQ separately describes a one-week free trial on registration.
+  - Every tier's limits are mirrored in rate-limits/alltick-api-rate-limits.yml.
+plans:
+  - name: Free
+    price: 0
+    currency: USDT
+    period: month
+    symbols: 10 fixed demo symbols (USD/JPY, Gold, USOil, Hang Seng Index, BTC/USDT, Dow Jones, Tesla, Tencent, SSE Composite, SZSE Component)
+    requests: 10 API calls per minute (1 per 6 seconds)
+    daily_cap: 1000
+    websocket_connections: 1
+    history: 1 year historical candlestick
+    features: [Last Price, End of Day Data]
+    excludes: [Real-time candlestick, Order Book, Real-time tick-by-tick]
+  - name: Basic
+    price: 99
+    currency: USDT
+    period: month
+    symbols: choose 100 symbols from all products
+    requests: 60 API calls per minute (1 per second)
+    daily_cap: 86400
+    websocket_connections: 1
+    history: 1 year historical candlestick
+    features: [Last Price, End of Day Data, Real-time candlestick, Order Book, Real-time tick-by-tick]
+  - name: Premium
+    price: 199
+    currency: USDT
+    period: month
+    symbols: choose 200 symbols from all products
+    requests: 600 API calls per minute (10 per second)
+    daily_cap: 864000
+    websocket_connections: 3
+    history: 3 years historical candlestick
+    features: [Last Price, End of Day Data, Real-time candlestick, Order Book, Real-time tick-by-tick]
+  - name: Professional
+    price: 399
+    currency: USDT
+    period: month
+    symbols: choose 3000 symbols from all products
+    requests: 1200 API calls per minute (20 per second)
+    daily_cap: 1728000
+    websocket_connections: 10
+    history: 5 years historical candlestick
+    features: [Last Price, End of Day Data, Real-time candlestick, Order Book, Real-time tick-by-tick]
+  - name: All HK Stocks
+    price: 399
+    currency: USDT
+    period: month
+    symbols: full Hong Kong stock market data (about 3000 stocks)
+    requests: 1200 API calls per minute (20 per second)
+    daily_cap: 1728000
+    websocket_connections: 10
+    history: about 500 historical candlesticks
+  - name: All CN Stocks
+    price: 599
+    currency: USDT
+    period: month
+    symbols: full CN stock market data (about 5000 stocks, excluding ST / *ST stocks)
+    requests: 1200 API calls per minute (20 per second)
+    daily_cap: 1728000
+    websocket_connections: 10
+    history: about 500 historical candlesticks
+  - name: All US Stocks
+    price: 799
+    currency: USDT
+    period: month
+    symbols: full U.S. stock market data (about 11000 stocks)
+    requests: 1200 API calls per minute (20 per second)
+    daily_cap: 1728000
+    websocket_connections: 10
+    history: about 500 historical candlesticks
+  - name: Free trial (on registration)
+    price: 0
+    currency: USDT
+    period: one week
+    source: https://en.apis.alltick.co/faqs/subscription-and-account-management/does-alltick-offer-a-free-trial-period.md
+    note: >-
+      "After registering with AllTick, users will receive a one-week free trial period." Counted as a
+      published commercial offer; it is not a line item on the pricing page.
+overage:
+  documented: false
+  note: >-
+    No overage price is published. Exceeding a plan returns errors (429 / ret 605 / ret 603) or is
+    silently truncated; it does not bill. Daily caps reset at midnight.
+refunds: >-
+  Non-refundable and non-cancellable during the service period, per AllTick's own FAQ.

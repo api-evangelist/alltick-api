@@ -1,0 +1,134 @@
+generated: '2026-08-18'
+method: searched
+source: https://en.apis.alltick.co/integration-process/interface-restriction-description/error-code-description
+docs: https://en.apis.alltick.co/integration-process/interface-restriction-description/error-code-description
+checked: '2026-08-18'
+format: proprietary
+error_count: 11
+summary: >-
+  AllTick publishes a single numeric error registry shared by the HTTP and WebSocket surfaces. It is
+  NOT RFC 9457 — there is no application/problem+json media type, no `type` URI and no `title`
+  field. Errors ride inside the same JSON envelope as success responses, in an integer `ret` field
+  with a human string in `msg`. Codes below 500 mirror HTTP semantics; the 6xx block is
+  AllTick-specific (product/plan/permission). Note the OpenAPI declares only 200 responses for all
+  12 operations, so this registry exists ONLY in prose docs — an agent reading the spec alone would
+  not know any of these codes exist.
+envelope:
+  shape: |
+    {
+      "ret": 200,
+      "msg": "ok",
+      "trace": "c2a8a146-a647-4d6f-ac07-8c4805bf0b74",
+      "data": {}
+    }
+  fields:
+    - name: ret
+      type: int32
+      description: Error code. 200 = success.
+    - name: msg
+      type: string
+      description: Detailed description of success or failure.
+    - name: trace
+      type: string
+      description: Caller-generated correlation id, echoed verbatim. Max length 64.
+    - name: data
+      type: object
+      description: Payload; per-operation shape.
+  websocket_extra:
+    - name: cmd_id
+      type: uint32
+      description: Protocol number of the message.
+    - name: seq_id
+      type: uint32
+      description: Caller-generated sequence id, echoed in the response.
+  note: >-
+    The HTTP status code and `ret` do not always agree. Documented examples show ret 201/202 for
+    header/data validation failures where the doc table lists those messages under 400, so clients
+    must branch on `ret`, not on the status line.
+errors:
+  - code: 200
+    msg: ok
+    meaning: Success.
+    class: success
+  - code: 400
+    msg: request header param invalid
+    meaning: First-level JSON parameter problem.
+    class: client
+    remediation: >-
+      Check the JSON structure is complete, all required fields are present, `data` is a valid
+      object, and key fields like `trace` are present.
+  - code: 400
+    msg: request data param invalid
+    meaning: Invalid `data` field parameter in the JSON request.
+    class: client
+    remediation: >-
+      Confirm `data` is a valid object and every required field inside it is filled per the specific
+      interface documentation. Applies especially to POST bodies (/batch-kline).
+  - code: 401
+    msg: token invalid
+    meaning: The token is invalid.
+    class: auth
+    causes: [incorrect token format, token account has expired]
+    remediation: Re-read the token from the dashboard API keys section; renew the subscription if expired.
+  - code: 402
+    msg: query invalid
+    meaning: Invalid query parameters in the request.
+    class: client
+    remediation: >-
+      Check the GET `query` parameter, URL-encode it, confirm the format matches the interface, and
+      escape special characters.
+  - code: 429
+    msg: Too Many Requests
+    meaning: Exceeded the subscribed plan's request frequency.
+    class: rate-limit
+    remediation: Reduce request frequency or upgrade the plan. See rate-limits/.
+  - code: 600
+    msg: code invalid
+    meaning: The requested product code is invalid.
+    class: client
+    remediation: >-
+      Stock and forex/metals data use DIFFERENT request URLs — verify the base path
+      (/quote-stock-b-api vs /quote-b-api) — then verify the code against the published product list.
+  - code: 601
+    msg: body empty
+    meaning: The request message body is empty.
+    class: client
+    remediation: >-
+      Populate the POST body with complete JSON. Most often hit on batch interfaces such as
+      /batch-kline, where parameters go in the body rather than the query string.
+  - code: 603
+    msg: token level not enough
+    meaning: >-
+      The requested number of products or candlesticks exceeds what the plan allows.
+    class: quota
+    remediation: >-
+      For K-line interfaces check (product count x candlestick type) against the plan cap; batch
+      requests return at most 2 candlesticks each. For other interfaces check the product count.
+  - code: 604
+    msg: code unauthorized
+    meaning: The token does not have permission to access this product code.
+    class: authorization
+    remediation: The symbol is outside the basket or market the plan covers; add it or upgrade.
+  - code: 605
+    msg: too many requests
+    meaning: Request frequency exceeds the limit (application level).
+    class: rate-limit
+    remediation: Reduce frequency or upgrade the plan.
+  - code: 606
+    msg: too many requests and connection will be closed
+    meaning: WebSocket request frequency limit exceeded; the connection is dropped.
+    class: rate-limit
+    remediation: >-
+      Stay under the plan's connection count, keep at least 1s between requests on a connection and
+      3s between requests across connections.
+rfc9457:
+  conforms: false
+  reasons:
+    - No application/problem+json media type is served or documented.
+    - No `type` URI, `title`, `status`, `detail` or `instance` members.
+    - Errors are returned inside a 200-shaped envelope keyed on `ret`.
+openapi_gap:
+  note: >-
+    openapi/alltick-api-openapi.json declares `responses: {200: ...}` and nothing else on all 12
+    operations. None of the 10 documented failure codes above are expressible from the spec. This is
+    the single highest-value contract fix available to AllTick.

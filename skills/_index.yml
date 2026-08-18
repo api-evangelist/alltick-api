@@ -1,0 +1,37 @@
+generated: '2026-08-18'
+method: generated
+source: >-
+  openapi/alltick-api-openapi.json + https://en.apis.alltick.co/ +
+  conventions/alltick-api-conventions.yml + rate-limits/alltick-api-rate-limits.yml +
+  errors/alltick-api-error-codes.yml + asyncapi/alltick-api-event-surface.yml
+checked: '2026-08-18'
+searched_first:
+  - what: provider-published Agent Skills / AGENTS.md / skills directory
+    result: none
+    probed:
+      - url: https://github.com/alltick/docs
+        status: 200
+        note: no AGENTS.md, no skills/ directory in the repository tree
+      - url: https://en.apis.alltick.co/llms.txt
+        status: 200
+        note: 79 documented pages, none about agents or skills
+summary: >-
+  Three packaged skills covering AllTick's marquee flows. Every operationId is verified against
+  openapi/alltick-api-openapi.json; every limit, error code and protocol number is quoted from
+  AllTick's own documentation. The streaming skill deliberately carries an empty operations[]
+  because AllTick's WebSocket surface is absent from its OpenAPI — there is nothing to ground it in
+  beyond the prose protocol reference.
+skills:
+  - file: alltick-api-quote-a-symbol.md
+    name: alltick-api-quote-a-symbol
+    summary: Price, order book and candlesticks for one instrument over HTTPS.
+    operations: [getStockTradeTick, getForexTradeTick, getStockDepthTick, getForexDepthTick, getStockKline, getForexKline]
+  - file: alltick-api-stream-realtime-ticks.md
+    name: alltick-api-stream-realtime-ticks
+    summary: Open, subscribe on and keep alive a WebSocket tick or depth stream.
+    operations: []
+    note: WebSocket cmd_id protocol; not covered by the OpenAPI.
+  - file: alltick-api-check-trading-halts.md
+    name: alltick-api-check-trading-halts
+    summary: Poll SSE/NYSE/NASDAQ halts and resumptions, and enrich them with instrument reference data.
+    operations: [getSseSuspension, getNyseSuspension, getNasdaqSuspension, getStockStaticInfo]

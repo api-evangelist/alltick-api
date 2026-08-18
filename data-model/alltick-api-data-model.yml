@@ -1,0 +1,134 @@
+generated: '2026-08-18'
+method: derived
+source: openapi/alltick-api-openapi.json
+checked: '2026-08-18'
+summary: >-
+  The whole model hangs off one key: `code`, the product/instrument code. It is not an opaque server
+  id — it is a human-composable string with a market suffix (700.HK, AAPL.US, 600519.SH, BTCUSDT,
+  EURUSD, XAUUSD), and every entity in the API is a time series or a fact attached to one of them.
+  There are no `$ref`s between entity schemas: all seven components.schemas are self-contained
+  response envelopes with entities inlined, so relationships are expressed by shared `code`/`symbol`
+  values rather than by references. Nothing here is writable; there are no user, account, order or
+  subscription resources in the contract at all.
+identifiers:
+  - name: code
+    used_by: [Kline, TradeTick, DepthTick, BatchKline]
+    format: >-
+      market-suffixed instrument code. Equities carry an exchange suffix (700.HK Hong Kong,
+      AAPL.US United States, 600519.SH Shanghai, 300750.SZ Shenzhen); FX/metals/crypto are bare
+      pairs (EURUSD, XAUUSD, BTCUSDT).
+    opaque: false
+    note: >-
+      The valid set is published as spreadsheets/pages per market, not as an API endpoint. There is
+      no "list all codes" operation — code discovery is out-of-band. An unknown code returns
+      ret 600 "code invalid"; a code outside your plan returns ret 604 "code unauthorized".
+  - name: symbol
+    used_by: [StaticInfo, Suspension]
+    note: >-
+      The same concept as `code` under a different field name. StaticInfo returns it as `symbol`,
+      Suspension returns it as `symbol`/`symbolName`, market-data endpoints return it as `code`.
+      A consumer must normalise across three spellings of one key.
+  - name: seq
+    used_by: [TradeTick, DepthTick]
+    note: Per-instrument quote sequence number; the ordering key for a tick stream.
+  - name: trace
+    used_by: [all HTTP/WebSocket messages]
+    note: Caller-generated request correlation id, echoed. Not an entity id.
+entities:
+  - name: Instrument
+    described_by: StaticInfoResponse.data.static_info_list[]
+    key: symbol
+    fields:
+      - symbol
+      - name_en
+      - name_cn
+      - name_hk
+      - exchange
+      - board
+      - currency
+      - lot_size
+      - total_shares
+      - circulating_shares
+      - hk_shares
+      - eps
+      - eps_ttm
+      - bps
+      - dividend_yield
+    coverage: US, HK and A-share equities only
+    note: >-
+      This is the only reference-data entity. Forex, crypto and commodity codes have no static-info
+      equivalent — /static_info exists on the stock base path (/quote-stock-b-api) and NOT on
+      /quote-b-api.
+  - name: Kline
+    described_by: KlineResponse.data / BatchKlineResponse.data.kline_list[]
+    key: [code, kline_type, timestamp]
+    fields: [timestamp, open_price, close_price, high_price, low_price, volume, turnover]
+    dimensions:
+      kline_type: 1=1min 2=5min 3=15min 4=30min 5=1hour 6=2hour 7=4hour 8=daily 9=weekly 10=monthly
+      adjust_type: 0=ex-rights, 1=forward-adjusted
+    note: >-
+      All numeric fields are typed `string`, not `number` — prices, volumes and turnover are decimal
+      strings to avoid float loss. A generated client will hand back strings.
+  - name: TradeTick
+    described_by: TradeTickResponse.data.tick_list[]
+    key: [code, seq]
+    fields: [code, seq, tick_time, price, volume, turnover, trade_direction]
+    enums:
+      trade_direction: 0=neutral, 1=buy, 2=sell
+  - name: DepthTick
+    described_by: DepthTickResponse.data.tick_list[]
+    key: [code, seq]
+    fields: [code, seq, tick_time, "bids[]", "asks[]"]
+    nested:
+      - name: PriceLevel
+        fields: [price, volume]
+        note: bids[] and asks[] are ordered arrays of price levels; depth varies by market and plan.
+  - name: Suspension
+    described_by: SuspensionResponse.data[]
+    key: [symbol, haltDate, haltTime]
+    fields: [symbol, symbolName, haltReason, haltDate, haltTime, resumeDate, resumeTime, publishDate]
+    exchanges: [SSE, NYSE, NASDAQ]
+    note: >-
+      The only paginated collection in the API, and the only one with additionalProperties:true —
+      undocumented fields may appear.
+relationships:
+  - from: Instrument
+    to: Kline
+    type: has_many
+    via: symbol -> code
+  - from: Instrument
+    to: TradeTick
+    type: has_many
+    via: symbol -> code
+  - from: Instrument
+    to: DepthTick
+    type: has_many
+    via: symbol -> code
+  - from: Instrument
+    to: Suspension
+    type: has_many
+    via: symbol
+    note: equities only
+  - from: DepthTick
+    to: PriceLevel
+    type: has_many
+    via: "bids[] / asks[]"
+  - from: Kline
+    to: Instrument
+    type: belongs_to
+    via: code -> symbol
+schema_reuse:
+  components_schemas: 7
+  refs_between_schemas: 0
+  note: >-
+    Every entity is inlined inside its response envelope and duplicated where it recurs — the
+    candlestick object is defined twice (KlineResponse and BatchKlineResponse), the tick object
+    twice (TradeTickResponse and DepthTickResponse share nothing). Extracting Kline, Tick,
+    PriceLevel, Instrument and Suspension into reusable components and $ref-ing them is the second
+    highest-value contract improvement after adding 4xx responses.
+envelope_inconsistency:
+  note: >-
+    Six of the seven schemas use {ret, msg, trace, data}. SuspensionResponse uses
+    {success, timestamp, totalCount, totalPages, currentPage, currentSize, data} — a boolean instead
+    of a code, no trace, and pagination fields at the top level. Two envelope conventions coexist in
+    one specification.

@@ -1,0 +1,102 @@
+generated: '2026-08-18'
+method: derived
+source: >-
+  openapi/alltick-api-openapi.json + https://en.apis.alltick.co/ +
+  https://alltick.co/ + security/alltick-api-domain-security.yml
+checked: '2026-08-18'
+summary: >-
+  AllTick asserts no industry standard and no certification. It is a market-data vendor, not a
+  regulated venue or a payments participant, so most financial regimes do not apply — but the
+  ones that DO apply to any modern HTTP API (RFC 9457 problem details, RFC 8594 sunset, RFC 9116
+  security.txt, RateLimit header fields) are all absent. The one standard AllTick genuinely meets
+  is OpenAPI 3.1.0: it publishes a real, parseable, first-party specification.
+standards:
+  - id: openapi
+    name: OpenAPI Specification
+    version: 3.1.0
+    conforms: true
+    evidence: >-
+      https://apis.alltick.co/api-reference/openapi.json — HTTP 200, valid OpenAPI 3.1.0, 12
+      operations, servers[0] https://quote.alltick.co, info.title "AllTick Market Data API".
+      Maintained in the provider's own repository at github.com/alltick/docs.
+  - id: asyncapi
+    name: AsyncAPI
+    conforms: false
+    evidence: >-
+      Two production WebSocket streams are documented in prose (cmd_id 22000-22007, 22998, 22999)
+      but no AsyncAPI document is published on any host. See asyncapi/alltick-api-event-surface.yml.
+  - id: json-schema
+    name: JSON Schema
+    conforms: partial
+    evidence: >-
+      The OpenAPI 3.1.0 components.schemas block uses JSON Schema 2020-12 by virtue of the 3.1
+      dialect (7 schemas), but no standalone JSON Schema documents are published.
+  - id: oauth2
+    name: OAuth 2.0
+    conforms: false
+    evidence: >-
+      Auth is a single opaque token in the query string. No authorization server, no
+      /.well-known/oauth-authorization-server (404 on alltick.co), no scopes.
+  - id: oidc
+    name: OpenID Connect
+    conforms: false
+    evidence: https://alltick.co/.well-known/openid-configuration returns HTTP 404.
+  - id: rfc9457
+    name: RFC 9457 Problem Details for HTTP APIs
+    conforms: false
+    evidence: >-
+      Errors are an integer `ret` inside a 200-shaped JSON envelope; no application/problem+json.
+      See errors/alltick-api-error-codes.yml.
+  - id: rfc8594
+    name: RFC 8594 Sunset HTTP Header
+    conforms: false
+    evidence: No Sunset or Deprecation header documented or observed; no deprecation policy exists.
+  - id: rfc9116
+    name: RFC 9116 security.txt
+    conforms: false
+    evidence: https://alltick.co/.well-known/security.txt returns HTTP 404 (nginx).
+  - id: ratelimit-headers
+    name: IETF RateLimit header fields
+    conforms: false
+    evidence: >-
+      Per-plan limits are fully documented in prose but no RateLimit-*, X-RateLimit-* or Retry-After
+      header is defined. See rate-limits/alltick-api-rate-limits.yml.
+  - id: idempotency-key
+    name: IETF Idempotency-Key header field
+    conforms: false
+    evidence: Not documented. Surface is read-only; see conventions/alltick-api-conventions.yml.
+  - id: rest-pagination
+    name: Consistent pagination
+    conforms: partial
+    evidence: >-
+      Only the three /api/suspension/* endpoints paginate (page/size, totalCount/totalPages), and
+      they use a different response envelope from the rest of the API. Market-data endpoints
+      silently truncate instead of paginating.
+  - id: fix
+    name: FIX Protocol
+    conforms: false
+    evidence: No FIX/FAST session or FIX-derived JSON schema is offered; delivery is HTTPS + WebSocket JSON.
+  - id: mcp
+    name: Model Context Protocol
+    conforms: false
+    evidence: No first-party MCP server. See mcp/alltick-api-mcp.yml.
+  - id: a2a
+    name: A2A Agent Card
+    conforms: false
+    evidence: >-
+      /.well-known/agent-card.json and /.well-known/agent.json return 404 on alltick.co and
+      en.apis.alltick.co, and 401 (token gate) on quote.alltick.co.
+certifications:
+  published: []
+  trust_center: false
+  note: >-
+    No SOC 2, ISO 27001, PCI DSS or comparable certification is claimed anywhere on alltick.co, the
+    docs, or a trust portal. A `Compliance` pointer is therefore NOT emitted: there is nothing
+    published to point at.
+regulatory_context:
+  entity: AllTick PTE. LTD.
+  jurisdiction: Singapore
+  note: >-
+    Redistribution of exchange market data is normally governed by per-exchange licensing rather
+    than by an API standard. AllTick's Terms of Service (https://alltick.co/terms) is the only
+    document governing downstream use; no exchange licence attestations are published.

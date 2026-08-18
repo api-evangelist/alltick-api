@@ -1,0 +1,67 @@
+generated: '2026-08-18'
+method: searched
+source: >-
+  https://apis.alltick.co/en/api-reference/stock/kline + https://alltick.co/pricing +
+  https://github.com/alltick/docs/blob/main/docs.json +
+  https://github.com/alltick/alltick-realtime-forex-crypto-stock-tick-finance-websocket-api
+checked: '2026-08-18'
+summary: >-
+  There is no test mode. AllTick has one environment — production — one credential type, and no
+  test/live key separation, no sandbox host, no fixtures and no published demo token. What it does
+  offer is (a) an interactive request console embedded in the API reference and (b) a permanent
+  free tier that acts as the trial surface. An integrator "tests" by calling production with real
+  money's worth of real data, capped to 10 demo symbols.
+console:
+  present: true
+  type: embedded API playground
+  platform: Mintlify
+  mode: simple
+  url: https://apis.alltick.co/en/api-reference/stock/kline
+  evidence: >-
+    docs.json in github.com/alltick/docs declares {"api": {"baseUrl": "https://quote.alltick.co",
+    "playground": {"mode": "simple"}}}, and each /en/api-reference/* page renders as a Mintlify API
+    page against that base URL (HTTP 200).
+  note: >-
+    The playground calls production directly. It requires the caller's own token — there is no
+    pre-filled key — so it is a request builder, not a sandbox.
+test_mode:
+  present: false
+  key_prefixes: []
+  note: >-
+    One token type, one environment. No `test_`/`live_` prefixes, no mode switch in the dashboard,
+    nothing in the docs describing a test key. The example code in AllTick's GitHub repository uses
+    the literal placeholder string "testtoken", which is a placeholder to replace, NOT a working
+    shared credential — the API returns ret 401 "token invalid" for it.
+free_tier_as_sandbox:
+  present: true
+  price: 0 USDT/month
+  url: https://alltick.co/pricing
+  symbols: 10 fixed demo symbols
+  symbol_list:
+    - USD/JPY
+    - Gold
+    - USOil
+    - Hang Seng Index
+    - Bitcoin/Tether
+    - Dow Jones
+    - Tesla
+    - Tencent
+    - SSE Composite
+    - SZSE Component
+  limits: 10 API calls/minute, 1000/day, 1 WebSocket connection, 1 year of candlesticks
+  data: end-of-day and last price only — no real-time candlestick, no order book, no tick-by-tick
+  note: >-
+    This is the closest thing to a sandbox AllTick publishes, and it is materially different from
+    the paid product: the two capabilities most integrations are built around (order book and
+    tick-by-tick push) are not exercisable on it at all. A free-tier integration test does not prove
+    a paid-tier integration works.
+  trial: One-week free trial granted on registration, per AllTick's FAQ.
+test_fixtures:
+  present: false
+  test_symbols: []
+  time_simulation: false
+  triggers: false
+  note: >-
+    No magic instrument codes, no replay of a recorded session, no market-closed simulator, no way
+    to force an error condition. Testing halt/resume handling, limit-up/limit-down or a delisting
+    means waiting for one to happen in a live market.

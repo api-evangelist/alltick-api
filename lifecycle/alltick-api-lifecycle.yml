@@ -1,0 +1,73 @@
+generated: '2026-08-18'
+method: searched
+source: >-
+  https://status.alltick.co/ + https://alltick.co/ + https://alltick.co/terms +
+  https://en.apis.alltick.co/llms.txt + openapi/alltick-api-openapi.json
+checked: '2026-08-18'
+summary: >-
+  AllTick operates a status page and advertises a 99.95% SLA, but publishes no versioning policy, no
+  deprecation policy, no changelog and no sunset commitments. There is no version segment in any URL
+  and no version header, so a breaking change to the wire format has nowhere to be announced and no
+  way to be opted out of. Nothing in the contract is marked deprecated.
+versioning:
+  scheme: none
+  in_path: false
+  in_header: false
+  in_parameter: false
+  spec_version: 1.0.0
+  spec_version_source: openapi/alltick-api-openapi.json info.version
+  policy_published: false
+  note: >-
+    /quote-stock-b-api and /quote-b-api name market families, not versions. The "b" is part of the
+    service name, not a revision marker — the docs never describe an "a" predecessor.
+deprecation:
+  policy_published: false
+  sunset_header: false
+  deprecation_header: false
+  rfc8594: false
+  deprecated_operations: []
+  note: >-
+    No RFC 8594 Sunset or Deprecation header is documented or observed. No operation in the OpenAPI
+    carries `deprecated: true`. The WebSocket docs DO record one capability that was considered and
+    declined ("K-line push (not supported)"), which is an absence, not a deprecation.
+status_page:
+  present: true
+  url: https://status.alltick.co/
+  http_status: 200
+  title: 'Status - 服务状态 - Alltick'
+  platform: self-hosted (WordPress asset paths; not Statuspage/Better Stack/Instatus)
+  components_published: false
+  incident_history_published: false
+  rss: false
+  note: >-
+    The page exists and is branded AllTick ("Real-time Financial Market Data APIs"), but it renders
+    no per-component status matrix, no uptime history and no machine-readable feed, so it cannot be
+    polled by a client or an agent.
+sla:
+  published: true
+  value: 99.95%
+  source: https://alltick.co/
+  quote: 'Our system has 99.95% SLA.'
+  contractual: unknown
+  note: >-
+    Stated as a marketing claim on the homepage. Whether it is a contractual commitment with credits
+    is not established on the pricing page; the Terms of Service is a long HTML document at
+    https://alltick.co/terms and does not surface an SLA credit schedule in its headings.
+changelog:
+  present: false
+  probed:
+    - url: https://apis.alltick.co/en/changelog
+      status: 404
+    - url: https://apis.alltick.co/changelog
+      status: 404
+    - url: https://alltick.co/changelog
+      status: 404
+  note: >-
+    No dated changelog or release-notes page. The nearest thing to a public change record is the
+    commit history of https://github.com/alltick/docs, which is documentation, not API change.
+support:
+  email: support@alltick.co
+  telegram: https://t.me/alltick001
+  status_page: https://status.alltick.co/
+  contact_form: https://alltick.co/#contact
+company: AllTick PTE. LTD. (Singapore)

@@ -1,0 +1,103 @@
+generated: '2026-08-18'
+method: searched
+source: >-
+  https://en.apis.alltick.co/websocket-api/websocket-interface-api/transaction-quote-subscription +
+  https://en.apis.alltick.co/websocket-api/websocket-interface-api/handicap-quote-subscription +
+  https://en.apis.alltick.co/websocket-api/websocket-interface-api/cancel-quote-subscription +
+  https://en.apis.alltick.co/websocket-api/websocket-interface-api/ping-pong +
+  https://en.apis.alltick.co/integration-process/universal-standard-header-description/websocket-common-standard-header
+checked: '2026-08-18'
+summary: >-
+  AllTick has a genuine, production, push-based event surface — two WebSocket streams delivering
+  tick-by-tick trades and order-book depth — but ships NO machine-readable event contract for it.
+  The protocol is fully specified in prose (numbered cmd_id messages, request/response/push triples,
+  a mandatory heartbeat) and completely absent from every machine-readable artifact: the OpenAPI
+  covers only the 12 HTTP operations, and no AsyncAPI document exists on any host. This is a
+  streaming-first market-data vendor whose streaming half is invisible to tooling.
+asyncapi:
+  present: false
+  probed:
+    - url: https://quote.alltick.co/asyncapi.json
+      status: 401
+    - url: https://en.apis.alltick.co/asyncapi.yaml
+      status: 404
+    - url: https://apis.alltick.co/api-reference/openapi.json
+      status: 200
+      note: the only machine-readable contract; HTTP only, no `webhooks` block, no callbacks
+  note: >-
+    quote.alltick.co returns its token gate ({"msg":"token is required","ret":401}) for every path,
+    so a 401 there is a gate, not a hidden document.
+webhooks:
+  customer_registerable: false
+  openapi_webhooks_block: false
+  openapi_callbacks: false
+  note: >-
+    AllTick never calls a customer URL. Delivery is pull (HTTPS) or client-initiated subscribe-and-
+    receive (WebSocket). No `type: Webhooks` pointer is emitted, because AllTick advertises no
+    webhook surface and claiming one would be false.
+streams:
+  - name: Stock market data stream
+    url: wss://quote.alltick.co/quote-stock-b-ws-api
+    markets: [Hong Kong stocks, US stocks, A-shares]
+    auth: "'?token=yourToken' appended to the handshake URL"
+  - name: Forex / crypto / commodity stream
+    url: wss://quote.alltick.co/quote-b-ws-api
+    markets: [forex, cryptocurrencies, precious metals, crude oil]
+    auth: "'?token=yourToken' appended to the handshake URL"
+envelope:
+  request: {cmd_id: uint32, seq_id: uint32, trace: string, data: object}
+  response: {ret: int32, msg: string, cmd_id: uint32, seq_id: uint32, trace: string, data: object}
+protocol:
+  - cmd_id: 22000
+    direction: client -> server
+    name: Heartbeat (ping)
+    description: Must be sent every 10 seconds.
+  - cmd_id: 22001
+    direction: server -> client
+    name: Heartbeat response (pong)
+    description: >-
+      No heartbeat received within 30 seconds and the server closes the connection.
+  - cmd_id: 22002
+    direction: client -> server
+    name: Subscribe order book (market depth)
+    payload: symbol_list[]
+    description: One active order-book subscription per connection; a new request replaces the old set.
+  - cmd_id: 22003
+    direction: server -> client
+    name: Subscribe order book — acknowledgement
+  - cmd_id: 22999
+    direction: server -> client (push)
+    name: Order book tick push
+    payload: code, seq, tick_time, bids[], asks[]
+  - cmd_id: 22004
+    direction: client -> server
+    name: Subscribe latest trade price (tick-by-tick)
+    payload: symbol_list[]
+  - cmd_id: 22005
+    direction: server -> client
+    name: Subscribe latest trade price — acknowledgement
+  - cmd_id: 22998
+    direction: server -> client (push)
+    name: Trade tick push
+    payload: code, seq, tick_time, price, volume, turnover, trade_direction
+  - cmd_id: 22006
+    direction: client -> server
+    name: Cancel quote subscription
+    payload:
+      cancel_type: 0=cancel all, 1=cancel order book, 2=cancel trade, 3=cancel exchange rate
+  - cmd_id: 22007
+    direction: server -> client
+    name: Cancel quote subscription — acknowledgement
+not_supported:
+  - name: K-line push
+    detail: >-
+      AllTick states explicitly that the WebSocket interface does NOT push candlesticks; both
+      historical and real-time K-lines are HTTP-only.
+    source: https://en.apis.alltick.co/websocket-api/websocket-interface-api/ping-pong-1
+constraints: rate-limits/alltick-api-rate-limits.yml
+errors: errors/alltick-api-error-codes.yml
+pointer_note: >-
+  Neither an `AsyncAPI` nor a `Webhooks` pointer is emitted in apis.yml. The event surface is real
+  and this artifact documents it faithfully, but AllTick publishes no AsyncAPI document and no
+  webhooks; asserting either would credit a contract that does not exist. Publishing an AsyncAPI 3.0
+  document for these two channels is the highest-value single artifact AllTick could add.

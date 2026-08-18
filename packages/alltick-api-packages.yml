@@ -1,0 +1,101 @@
+generated: '2026-08-18'
+method: searched
+source: >-
+  https://registry.npmjs.org/-/v1/search?text=alltick + https://pypi.org/pypi/alltick/json +
+  https://crates.io/api/v1/crates?q=alltick + https://rubygems.org/api/v1/search.json?query=alltick +
+  https://github.com/alltick + https://apis.alltick.co/en/
+checked: '2026-08-18'
+summary: >-
+  AllTick publishes NO first-party client library to any package registry. What it publishes instead
+  is copy-paste example source in four languages (Go, Java, PHP, Python) inside its own GitHub
+  repository — code you clone, not a package you install. Two npm packages carry the AllTick name;
+  neither can be verified as first-party, so neither is marked official and no `SDKs` pointer is
+  emitted for this provider.
+registries_searched:
+  - registry: npm
+    query: alltick
+    hits: 2
+  - registry: pypi
+    query: alltick, alltick-api, pyalltick
+    hits: 0
+    note: all three return HTTP 404 from pypi.org/pypi/<name>/json
+  - registry: crates.io
+    query: alltick
+    hits: 0
+  - registry: rubygems
+    query: alltick
+    hits: 0
+  - registry: maven-central
+    query: alltick
+    hits: 0
+  - registry: nuget
+    query: alltick
+    hits: 0
+  - registry: packagist
+    query: alltick
+    hits: 0
+  - registry: pkg.go.dev
+    query: alltick
+    hits: 0
+    note: >-
+      The provider's Go example ships as example/go/main.go inside the docs repo with a local
+      go.mod; it is not a published, importable module path.
+packages:
+  - name: alltick-realtime-forex-crypto-stock-tick-finance-websocket-api
+    language: multi
+    registry: none
+    distribution: source
+    url: https://github.com/alltick/alltick-realtime-forex-crypto-stock-tick-finance-websocket-api
+    official: true
+    official_evidence: >-
+      README.md states "Author: AllTick" and links https://alltick.co as the official website;
+      docs.json in the sibling alltick/docs repo builds apis.alltick.co, AllTick's live docs site.
+    version: null
+    published: '2026-07-27'
+    published_source: GitHub pushed_at on the default branch (no tagged releases, no registry entry)
+    note: >-
+      First-party example code, not a client library: example/{go,java,php,python} contain a single
+      HTTP example and a single WebSocket example each, hard-coded to quote.alltick.co with a
+      "testtoken" placeholder. There is no package name, no versioning and nothing to install, so
+      `version` is null by fact rather than by omission. 600 GitHub stars.
+  - name: alltick-agent
+    language: javascript
+    registry: npm
+    url: https://www.npmjs.com/package/alltick-agent
+    official: false
+    official_evidence: >-
+      UNVERIFIED. package.json sets author.name to "Alltick Team" and keywords include alltick/mcp,
+      and the bundle really does call AllTick hosts (quote.alltick.io) — but the package has no
+      repository or homepage field, is published by a personal npm account (handy198,
+      obyeah@gmail.com), and is referenced nowhere in AllTick's docs, llms.txt or GitHub account.
+      Its own README instructs `npm install @alltick/agent`, a scoped name that returns 404 on npm,
+      which is what a name-squat or an unfinished org migration looks like. Not credited to AllTick.
+    version: 1.0.0
+    published: '2026-03-22'
+    published_source: https://registry.npmjs.org/alltick-agent (time[1.0.0])
+    ships:
+      - HTTP client (kline, trade, order book, batch kline)
+      - WebSocket client (subscribe/push/heartbeat)
+      - MCP server (5 tools)
+      - CLI (bin `alltick`)
+    note: >-
+      Single 1.0.0 release, no dependencies declared, MIT. Treated as a third-party wrapper until
+      AllTick links it from its own surface.
+  - name: alltick-stock-mcp-server
+    language: javascript
+    registry: npm
+    url: https://www.npmjs.com/package/alltick-stock-mcp-server
+    official: false
+    official_evidence: >-
+      Third-party. Its own description says "A股市场数据MCP服务器 - 基于AllTick数据源"
+      ("China A-share market data MCP server - based on the AllTick data source"), i.e. it is built
+      ON AllTick, not BY AllTick. No author field; maintainer is a personal QQ-mail npm account.
+    version: 1.0.3
+    published: '2025-08-26'
+    published_source: https://registry.npmjs.org/alltick-stock-mcp-server (time[1.0.3])
+    note: Depends on @modelcontextprotocol/sdk ^0.4.0. Last published 2025-08-26.
+sdk_pointer_emitted: false
+sdk_pointer_note: >-
+  No `type: SDKs` pointer is wired in apis.yml. sdk_count is meant to measure first-party client
+  libraries a developer can install; AllTick has zero, and crediting an unverified personal-account
+  npm package would assert an SDK the company has never claimed.

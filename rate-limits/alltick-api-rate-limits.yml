@@ -1,0 +1,171 @@
+generated: '2026-08-18'
+method: searched
+source: >-
+  https://en.apis.alltick.co/integration-process/interface-restriction-description/http-interface-restrictions +
+  https://en.apis.alltick.co/integration-process/interface-restriction-description/websocket-interface-limitations +
+  https://en.apis.alltick.co/integration-process/interface-restriction-description/error-code-description +
+  https://alltick.co/pricing
+docs: https://en.apis.alltick.co/integration-process/interface-restriction-description
+checked: '2026-08-18'
+limit_count: 14
+summary: >-
+  AllTick publishes an unusually complete limit reference: per-endpoint request frequency for every
+  plan, per-plan daily request ceilings, per-plan WebSocket connection counts, and per-plan payload
+  ceilings (how many product codes or candlesticks one call may ask for). Limits are enforced per
+  TOKEN, never per IP — the docs say so explicitly. What is missing is the runtime half: AllTick
+  documents no rate-limit response headers at all, so a client cannot read remaining quota or a
+  reset time from a response. Exhaustion is signalled only in the body (`ret`) and, for HTTP, the
+  status code.
+enforcement_scope: per-token
+ip_based: false
+ip_note: >-
+  "Requests are limited based on the token, not the IP address." Two different IPs sharing one token
+  share one budget; one IP holding two tokens gets two budgets.
+headers:
+  documented: false
+  request: []
+  response: []
+  retry_after: false
+  note: >-
+    No X-RateLimit-*, RateLimit-* or Retry-After header appears anywhere in the docs, in llms.txt,
+    or in the OpenAPI response definitions. The only signal a client gets is the JSON envelope.
+exhaustion:
+  http_status: 429
+  body_codes:
+    - code: 429
+      msg: Too Many Requests
+      meaning: Exceeded the subscribed plan's request frequency.
+    - code: 605
+      msg: too many requests
+      meaning: Request frequency exceeds limit (application-level).
+    - code: 606
+      msg: too many requests and connection will be closed
+      meaning: WebSocket request frequency limit; the connection is dropped.
+    - code: 603
+      msg: token level not enough
+      meaning: >-
+        Requested product-code count or candlestick count exceeds what the plan allows. A quota
+        error, not a frequency error.
+  envelope_field: ret
+  note: >-
+    A 429 is returned per endpoint, not per account: on the Basic plan a second /kline call inside
+    the same second is rejected while a /trade-tick call in that same second still succeeds.
+limits:
+  - id: http-per-endpoint-free
+    scope: per-token per-endpoint
+    plan: Free
+    endpoints: [/kline, /batch-kline, /depth-tick, /trade-tick, /static_info]
+    limit: 1
+    window: 10s
+  - id: http-suspension-all-plans
+    scope: per-token per-endpoint
+    plan: all
+    endpoints: [/api/suspension/sse, /api/suspension/nyse, /api/suspension/nasdaq]
+    limit: 1
+    window: 1m
+  - id: http-per-endpoint-basic
+    scope: per-token per-endpoint
+    plan: Basic
+    endpoints: [/kline, /depth-tick, /trade-tick, /static_info]
+    limit: 1
+    window: 1s
+    exception:
+      endpoint: /batch-kline
+      limit: 1
+      window: 3s
+  - id: http-per-endpoint-premium
+    scope: per-token per-endpoint
+    plan: Premium
+    endpoints: [/kline, /depth-tick, /trade-tick, /static_info]
+    limit: 10
+    window: 1s
+    exception:
+      endpoint: /batch-kline
+      limit: 1
+      window: 2s
+  - id: http-per-endpoint-professional
+    scope: per-token per-endpoint
+    plan: Professional, All HK Stocks, All CN Stocks, All US Stocks
+    endpoints: [/kline, /depth-tick, /trade-tick, /static_info]
+    limit: 20
+    window: 1s
+    exception:
+      endpoint: /batch-kline
+      limit: 1
+      window: 1s
+  - id: http-aggregate-free
+    scope: per-token account-wide
+    plan: Free
+    limit: 10
+    window: 1m
+    daily_cap: 1000
+    reset: midnight
+  - id: http-aggregate-basic
+    scope: per-token account-wide
+    plan: Basic
+    limit: 60
+    window: 1m
+    daily_cap: 86400
+    reset: midnight
+  - id: http-aggregate-premium
+    scope: per-token account-wide
+    plan: Premium
+    limit: 600
+    window: 1m
+    daily_cap: 864000
+    reset: midnight
+  - id: http-aggregate-professional
+    scope: per-token account-wide
+    plan: Professional, All HK Stocks, All CN Stocks, All US Stocks
+    limit: 1200
+    window: 1m
+    daily_cap: 1728000
+    reset: midnight
+  - id: ws-connections
+    scope: per-token concurrent connections
+    limit_by_plan:
+      Free: 1
+      Basic: 1
+      Premium: 3
+      Professional: 10
+      All HK Stocks: 10
+      All CN Stocks: 10
+    note: >-
+      The stock stream (/quote-stock-b-ws-api) and the forex/crypto/commodity stream
+      (/quote-b-ws-api) each count as one connection. Excess connections are dropped immediately.
+  - id: ws-request-frequency
+    scope: per WebSocket connection
+    endpoints: [trade subscription (cmd_id 22004), order book subscription (cmd_id 22002)]
+    limit: 1
+    window: 1s
+    note: At least 1s between requests on one connection; at least 3s between requests across connections.
+  - id: ws-reconnect-backoff
+    scope: per-token
+    limit_by_plan:
+      Free: min 10s between reconnection attempts
+      paid: min 3s between reconnection attempts
+  - id: ws-heartbeat
+    scope: per WebSocket connection
+    requirement: client sends cmd_id 22000 every 10s
+    timeout: 30s
+    note: No heartbeat within 30s and the server closes the connection.
+payload_limits:
+  - endpoint: /kline
+    rule: one product code per request; max 500 candlesticks returned (excess silently truncated).
+  - endpoint: /batch-kline
+    rule: >-
+      max 2 candlesticks per code; max (codes x candlestick types) per request by plan —
+      Free 5, Basic 100, Premium 200, Professional/All-HK/All-CN 500.
+  - endpoint: /trade-tick
+    rule: >-
+      Free max 5 codes; paid plans recommended max 50 codes per GET (URL length), use WebSocket beyond that.
+  - endpoint: /depth-tick
+    rule: >-
+      Free max 5 codes; paid plans recommended max 50 codes per GET, use WebSocket beyond that.
+  - endpoint: /static_info
+    rule: Free max 5 codes; paid plans recommended max 50 codes per GET.
+  - endpoint: websocket subscriptions
+    rule: >-
+      concurrent subscribed codes per connection by plan — Free 5, Basic 100, Premium 200,
+      Professional/All-HK/All-CN 3000, for both the trade and order-book streams.
+    note: Over-subscription is silently truncated to the first N codes, not rejected.

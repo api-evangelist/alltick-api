@@ -1,0 +1,122 @@
+generated: '2026-08-18'
+method: searched
+source: >-
+  https://en.apis.alltick.co/integration-process/universal-standard-header-description/http-common-standard-headers +
+  https://en.apis.alltick.co/integration-process/universal-standard-header-description/websocket-common-standard-header +
+  https://en.apis.alltick.co/integration-process/interface-restriction-description +
+  openapi/alltick-api-openapi.json
+checked: '2026-08-18'
+summary: >-
+  AllTick runs one envelope across two transports. Every request — HTTP or WebSocket — carries a
+  caller-generated `trace` correlation id and a `data` object; every response echoes `trace` and adds
+  `ret`/`msg`. The unusual part is the HTTP shape: GET requests do not use conventional query
+  parameters, they carry the entire request document as a single URL-encoded JSON string in a
+  parameter literally named `query`. There is no idempotency mechanism, no pagination on the market
+  data endpoints, no field expansion, no sparse fieldsets, no metadata bag and no API version in the
+  path or in a header.
+transport:
+  http:
+    base_urls:
+      - https://quote.alltick.co/quote-stock-b-api    # HK / US / A-share stocks
+      - https://quote.alltick.co/quote-b-api          # forex, crypto, commodities
+      - https://quote.alltick.co/api/suspension       # US/CN trading-halt lists
+    content_type: application/json
+    methods: [GET, POST]
+    note: >-
+      Choosing the wrong base path for an asset class is the documented cause of error 600
+      "code invalid" — the two market families are separate services, not one namespace.
+  websocket:
+    urls:
+      - wss://quote.alltick.co/quote-stock-b-ws-api
+      - wss://quote.alltick.co/quote-b-ws-api
+    framing: JSON text frames keyed by an integer `cmd_id` protocol number
+request_shape:
+  get:
+    style: single JSON document, URL-encoded, in the `query` parameter
+    example: /quote-stock-b-api/kline?token=yourToken&query=%7B%22trace%22...%7D
+    consequence: >-
+      Practical URL-length limits, not a documented row count, are what cap batch GETs — the docs
+      recommend at most 50 product codes per GET and point heavier callers at WebSocket.
+  post:
+    style: JSON body
+    used_by: [/quote-stock-b-api/batch-kline, /quote-b-api/batch-kline]
+  common_request_fields:
+    - name: trace
+      type: string
+      required: true
+      max_length: 64
+      description: Caller-generated unique id; echoed verbatim in the response.
+    - name: data
+      type: object
+      required: true
+      description: Per-interface payload.
+    - name: cmd_id
+      type: uint32
+      required: true
+      transport: websocket
+      description: Protocol number identifying the message type.
+    - name: seq_id
+      type: uint32
+      required: true
+      transport: websocket
+      description: Caller-generated sequence id; echoed in the response.
+response_shape:
+  envelope: {ret: int32, msg: string, trace: string, data: object}
+  websocket_envelope: {ret: int32, msg: string, cmd_id: uint32, seq_id: uint32, trace: string, data: object}
+  success_code: 200
+  errors: errors/alltick-api-error-codes.yml
+tracing:
+  supported: true
+  mechanism: caller-generated `trace` in the request body/query document
+  echoed: true
+  header: false
+  note: >-
+    This is a real request-correlation primitive, but it is a BODY field, not a header — an HTTP
+    proxy, gateway or observability sidecar cannot see or propagate it. There is no X-Request-Id.
+idempotency:
+  supported: false
+  mechanism: null
+  note: >-
+    No Idempotency-Key header, no idempotency guidance and no idempotency semantics are documented.
+    In practice the whole surface is read-only — every operation is a query, and the two POSTs
+    (/batch-kline) are POST-as-query for body length reasons, not state mutations — so replay is
+    naturally safe. That is an accident of the domain, not a published guarantee, so NO
+    `type: Idempotency` pointer is emitted for this provider.
+pagination:
+  market_data:
+    supported: false
+    note: >-
+      K-line, tick, depth and static-info calls are bounded by hard per-plan caps (max 500
+      candlesticks, max N product codes) and silently truncate rather than paginate. There is no
+      cursor, offset or next link, so there is no way to walk past a cap.
+  suspension_endpoints:
+    supported: true
+    style: page-number
+    params: [page (default 1), size (default 10)]
+    response_fields: [totalCount, totalPages, currentPage, currentSize]
+    endpoints: [/api/suspension/sse, /api/suspension/nyse, /api/suspension/nasdaq]
+    note: >-
+      These three endpoints use a completely different envelope from the rest of the API —
+      {success, timestamp, totalCount, totalPages, currentPage, currentSize, data} instead of
+      {ret, msg, trace, data}. Two conventions coexist in one contract.
+field_expansion:
+  supported: false
+sparse_fieldsets:
+  supported: false
+metadata:
+  supported: false
+versioning:
+  in_path: false
+  in_header: false
+  scheme: none
+  note: >-
+    Base paths encode the market family (quote-stock-b-api / quote-b-api), not a version. The
+    OpenAPI declares info.version 1.0.0; nothing in the URL, a header or a parameter lets a client
+    pin it. See lifecycle/alltick-api-lifecycle.yml.
+rate_limit_signalling:
+  headers: false
+  detail: rate-limits/alltick-api-rate-limits.yml
+  note: Limits are documented but never surfaced at runtime — no RateLimit-* headers, no Retry-After.
+authentication: authentication/alltick-api-authentication.yml
+errors: errors/alltick-api-error-codes.yml
+lifecycle: lifecycle/alltick-api-lifecycle.yml

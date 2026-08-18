@@ -1,0 +1,65 @@
+generated: '2026-08-18'
+method: searched
+source: >-
+  https://en.apis.alltick.co/integration-process/token-application +
+  https://en.apis.alltick.co/integration-process/market-address-description/http-quotes-api-address-description +
+  https://en.apis.alltick.co/integration-process/market-address-description/websocket-quotes-api-address-description +
+  openapi/alltick-api-openapi.json
+docs: https://en.apis.alltick.co/integration-process/token-application
+checked: '2026-08-18'
+summary: >-
+  One credential, one mechanism, everywhere: a single opaque account token passed as the `token`
+  QUERY STRING parameter, on both the HTTPS endpoints and the WebSocket handshake URL. There is no
+  OAuth, no OIDC, no mTLS, no signing, no header-based key, no per-key scoping and no documented
+  rotation or expiry story beyond "the token expires when the account does". Entitlement is carried
+  by the token itself: which symbols and which markets you may read is a property of the plan the
+  token belongs to (errors 604 `code unauthorized` and 603 `token level not enough`).
+schemes:
+  - id: token
+    type: apiKey
+    in: query
+    name: token
+    required: true
+    applies_to:
+      - https://quote.alltick.co/quote-stock-b-api/*
+      - https://quote.alltick.co/quote-b-api/*
+      - https://quote.alltick.co/api/suspension/*
+      - wss://quote.alltick.co/quote-stock-b-ws-api
+      - wss://quote.alltick.co/quote-b-ws-api
+    example_form: https://quote.alltick.co/quote-stock-b-api/kline?token=yourToken&query=queryData
+    websocket_form: wss://quote.alltick.co/quote-stock-b-ws-api?token=yourToken
+    format: opaque string; no documented prefix, length or structure
+    rotation: not documented
+    expiry: tied to subscription validity — an expired account yields ret 401 "token invalid"
+issuance:
+  self_serve: true
+  steps:
+    - Register at https://alltick.co/register with an email address and password.
+    - Confirm the emailed verification code.
+    - On success you land in the dashboard.
+    - Read the token from the dashboard "API keys" section.
+  url: https://alltick.co/register
+  approval_required: false
+  note: AllTick's FAQ states registration includes a one-week free trial.
+missing_from_spec:
+  components_securitySchemes: false
+  root_security: false
+  note: >-
+    openapi/alltick-api-openapi.json has NO components.securitySchemes block and NO top-level
+    `security` requirement. The token appears only as an ordinary required query parameter on each
+    operation, carrying the literal default value "YOUR_TOKEN_HERE". A generator reading this spec
+    produces a client with no auth concept at all. Adding an `apiKey`/`in: query` scheme and applying
+    it globally is a one-block fix.
+credential_exposure:
+  concern: >-
+    Passing a long-lived bearer credential in the query string, on both HTTP and the WebSocket URL,
+    puts it in proxy logs, browser history, Referer headers and server access logs. AllTick's own
+    guidance is limited to "keep your token secure and avoid sharing it". A header (or
+    `Authorization: Bearer`) alternative is not offered.
+  documented_by_provider: false
+scopes:
+  present: false
+  note: >-
+    No OAuth scopes exist, so no scopes/ artifact is written. Authorization is plan-level, not
+    scope-level: the token's plan determines symbol basket, market coverage, request rate and
+    history depth.

@@ -1,0 +1,107 @@
+overlay: 1.0.0
+info:
+  title: API Evangelist enhancements for the AllTick Market Data API
+  version: 1.0.0
+x-provenance:
+  generated: '2026-08-18'
+  method: generated
+  source: openapi/alltick-api-openapi.json
+  extends: openapi/alltick-api-openapi.json
+  target_spec: https://apis.alltick.co/api-reference/openapi.json
+  note: >-
+    Non-destructive enhancements derived from AllTick's own published documentation. Every value
+    below is traceable to a provider page; nothing is invented. Applying this overlay does not
+    change AllTick's spec — the original is preserved verbatim in openapi/_original/.
+actions:
+  - target: $.info
+    description: Add contact, licence-bearing terms and documentation links AllTick publishes but omits from the spec.
+    update:
+      contact:
+        name: AllTick Support
+        email: support@alltick.co
+        url: https://alltick.co/
+      termsOfService: https://alltick.co/terms
+      x-privacy-policy: https://alltick.co/policy
+      x-status-page: https://status.alltick.co/
+      x-pricing: https://alltick.co/pricing
+      x-company: AllTick PTE. LTD.
+  - target: $
+    description: >-
+      Declare the token security scheme the API actually enforces. The published spec has no
+      components.securitySchemes and no root security requirement, yet every operation 401s
+      without a token.
+    update:
+      externalDocs:
+        description: AllTick API documentation
+        url: https://apis.alltick.co/en
+      security:
+        - allTickToken: []
+  - target: $.components
+    description: Add the apiKey scheme matching the documented query-string token.
+    update:
+      securitySchemes:
+        allTickToken:
+          type: apiKey
+          in: query
+          name: token
+          description: >-
+            Account token issued in the AllTick dashboard under "API keys" after registering at
+            https://alltick.co/register. The same token authenticates the HTTPS endpoints and the
+            WebSocket handshake URL. Plan entitlement (symbol basket, market coverage, request rate)
+            is a property of the token.
+  - target: $.servers
+    description: Record the WebSocket streams that carry the real-time half of the product.
+    update:
+      - url: https://quote.alltick.co
+        description: Production
+        x-websocket-streams:
+          - url: wss://quote.alltick.co/quote-stock-b-ws-api
+            description: Stock (HK / US / A-share) real-time trade and order-book stream
+          - url: wss://quote.alltick.co/quote-b-ws-api
+            description: Forex, cryptocurrency and commodity real-time trade and order-book stream
+  - target: $.paths.*.*
+    description: >-
+      Attach the documented failure envelope to every operation. AllTick's spec declares only a 200
+      response on all 12 operations while its docs publish 10 distinct error codes.
+    update:
+      x-error-catalog: errors/alltick-api-error-codes.yml
+      x-rate-limits: rate-limits/alltick-api-rate-limits.yml
+      x-rate-limit-headers: none published
+  - target: $.paths['/quote-stock-b-api/kline'].get
+    description: Record the truncation limits the docs publish for single-product K-line queries.
+    update:
+      x-limits:
+        max_codes_per_request: 1
+        max_klines_returned: 500
+        truncation: silent — requests above the cap return the first 500 records
+  - target: $.paths['/quote-stock-b-api/batch-kline'].post
+    description: Record the plan-scaled batch ceiling documented for batch K-line queries.
+    update:
+      x-limits:
+        max_klines_per_code: 2
+        max_datasets_by_plan:
+          Free: 5
+          Basic: 100
+          Premium: 200
+          Professional: 500
+        formula: datasets = product code count x candlestick type count
+  - target: $.paths['/api/suspension/sse'].get
+    description: >-
+      Flag the second response envelope. The three suspension endpoints do not use the
+      {ret,msg,trace,data} shape the other nine operations use.
+    update:
+      x-envelope: '{success, timestamp, totalCount, totalPages, currentPage, currentSize, data}'
+      x-pagination:
+        style: page-number
+        params: [page, size]
+  - target: $.tags
+    description: >-
+      Introduce tags. No operation in the published spec carries a tag, so every generated client
+      lands in one undifferentiated namespace.
+    update:
+      - name: Stocks
+        description: Hong Kong, US and A-share market data on the /quote-stock-b-api base path.
+      - name: Forex, Crypto & Commodities
+        description: Forex, cryptocurrency and precious-metal market data on the /quote-b-api base path.
+      - name: Trading Halts
+        description: SSE, NYSE and NASDAQ suspension and resumption listings.
