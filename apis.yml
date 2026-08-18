@@ -1,0 +1,74 @@
+name: AllTick API
+description: >-
+  AllTick provides real-time and historical financial market tick data via REST and WebSocket APIs, covering Forex,
+  stocks (Hong Kong, US), commodities, and cryptocurrencies. Designed for exchanges, developers, quantitative teams, and
+  fintech institutions, offering K-line, latest trade tick, and market depth data with token-based authentication.
+url: https://alltick-api.apievangelist.com/apis.yml
+created: '2026-08-18'
+modified: '2026-08-18'
+specificationVersion: '0.21'
+tags:
+  - financial-market-data
+  - real-time-data
+  - stock-market-data
+  - forex-data
+  - cryptocurrency-data
+  - commodities-data
+  - tick-data
+  - websocket-streaming
+  - fintech
+  - quantitative-trading
+apis:
+  - name: AllTick REST/HTTP Query API
+    description: >-
+      Token-authenticated HTTP query API for financial market tick data including K-line, trade tick, market depth, and
+      static info. Separate endpoints for stock and for forex/crypto/commodities.
+    humanURL: https://en.apis.alltick.co/
+    baseURL: https://quote.alltick.co
+    tags:
+      - financial-market-data
+      - real-time-data
+      - stock-market-data
+      - forex-data
+      - cryptocurrency-data
+      - commodities-data
+      - tick-data
+      - websocket-streaming
+      - fintech
+      - quantitative-trading
+    properties:
+      - type: Documentation
+        url: https://en.apis.alltick.co/
+      - type: LLMsTxt
+        url: https://en.apis.alltick.co/llms.txt
+      - type: PostmanCollection
+        url: https://www.postman.com/alltick
+  - name: AllTick WebSocket Streaming API
+    description: >-
+      Token-authenticated WebSocket streaming API for subscribing to real-time market data. Endpoints:
+      wss://quote.alltick.co/quote-stock-b-ws-api (stock) and wss://quote.alltick.co/quote-b-ws-api
+      (forex/crypto/commodities).
+    humanURL: https://en.apis.alltick.co/
+    baseURL: wss://quote.alltick.co
+    tags:
+      - financial-market-data
+      - real-time-data
+      - stock-market-data
+      - forex-data
+      - cryptocurrency-data
+      - commodities-data
+      - tick-data
+      - websocket-streaming
+      - fintech
+      - quantitative-trading
+    properties:
+      - type: Documentation
+        url: https://en.apis.alltick.co/
+maintainers:
+  - FN: AllTick
+    url: https://alltick.co/
+generated:
+  by: apis.io/add
+  model: claude-opus-4-8
+  confidence: 90
+  at: '2026-08-18T02:12:28.996Z'
