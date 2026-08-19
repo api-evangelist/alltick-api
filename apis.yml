@@ -12,7 +12,7 @@ image: https://alltick.co/images/logo.png
 url: https://alltick-api.apievangelist.com/apis.yml
 created: '2026-08-18'
 modified: '2026-08-18'
-specificationVersion: '0.21'
+specificationVersion: '0.23'
 tags:
 - financial-market-data
 - real-time-data
