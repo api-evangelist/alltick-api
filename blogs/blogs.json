@@ -1,0 +1,21 @@
+{
+  "repo": "alltick-api",
+  "feeds": [
+    {
+      "source": "https://alltick.co/faqs",
+      "feed_url": "https://alltick.co/faqs",
+      "title": "",
+      "saved": 0,
+      "method": "none"
+    },
+    {
+      "source": "https://blog.alltick.co/",
+      "feed_url": "https://blog.alltick.co/feed/",
+      "title": "",
+      "saved": 1,
+      "method": "discovered"
+    }
+  ],
+  "post_count": 1,
+  "fetched": "2026-08-22T20:20:02Z"
+}
