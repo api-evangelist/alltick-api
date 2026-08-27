@@ -40,59 +40,13 @@ tags_raw:
 - market-data-api
 - trading-halts
 apis:
-- name: AllTick REST/HTTP Query API
-  description: 'Token-authenticated HTTPS query API for financial market tick data. Twelve operations
-    across three base paths: /quote-stock-b-api for Hong Kong, US and A-share equities, /quote-b-api for
-    forex, cryptocurrencies and commodities, and /api/suspension for SSE, NYSE and NASDAQ trading halts.
-    Returns candlesticks (single and batch), latest trade price, order-book depth and equity static reference
-    data. GET requests carry the whole request as a URL-encoded JSON document in a `query` parameter;
-    responses use a {ret, msg, trace, data} envelope.'
-  humanURL: https://apis.alltick.co/en
-  baseURL: https://quote.alltick.co
-  tags:
-  - Financial market data
-  - Real-Time Data
-  - stock-market-data
-  - forex-data
-  - cryptocurrency-data
-  - commodities-data
-  - Tick Data
-  - Fintech
-  - Quantitative Trading
-  - trading-halts
-  tags_raw:
-  - financial-market-data
-  - real-time-data
-  - stock-market-data
-  - forex-data
-  - cryptocurrency-data
-  - commodities-data
-  - tick-data
-  - fintech
-  - quantitative-trading
-  - trading-halts
-  properties:
-  - type: OpenAPI
-    url: openapi/alltick-api-openapi.json
-  - type: Documentation
-    url: https://apis.alltick.co/en
-  - type: APIReference
-    url: https://apis.alltick.co/en/api-reference/stock/kline
-  - type: GettingStarted
-    url: https://en.apis.alltick.co/integration-process/process-description
-  - type: LLMsTxt
-    url: https://en.apis.alltick.co/llms.txt
-  - type: Overlay
-    url: overlays/alltick-api-openapi-overlay.yaml
-  - type: DataModel
-    url: data-model/alltick-api-data-model.yml
 - name: AllTick WebSocket Streaming API
-  description: 'Token-authenticated WebSocket streaming API for real-time market data. Two endpoints —
-    wss://quote.alltick.co/quote-stock-b-ws-api for equities and wss://quote.alltick.co/quote-b-ws-api
-    for forex, crypto and commodities — carrying a numbered cmd_id protocol: subscribe to tick-by-tick
-    trades (22004, pushed on 22998) or order-book depth (22002, pushed on 22999), cancel with 22006, and
-    hold the connection open with a mandatory 10-second heartbeat (22000/22001). Candlesticks are not
-    pushed; they are HTTP-only.'
+  description: >-
+    Token-authenticated WebSocket streaming API for real-time market data. Two endpoints — wss://quote.alltick.co/quote-stock-b-ws-api
+    for equities and wss://quote.alltick.co/quote-b-ws-api for forex, crypto and commodities — carrying
+    a numbered cmd_id protocol: subscribe to tick-by-tick trades (22004, pushed on 22998) or order-book
+    depth (22002, pushed on 22999), cancel with 22006, and hold the connection open with a mandatory 10-second
+    heartbeat (22000/22001). Candlesticks are not pushed; they are HTTP-only.
   humanURL: https://en.apis.alltick.co/websocket-api/websocket-interface-api
   baseURL: wss://quote.alltick.co
   tags:
@@ -121,7 +75,68 @@ apis:
   - type: Documentation
     url: https://en.apis.alltick.co/websocket-api/websocket-interface-api
   - type: APIReference
-    url: https://en.apis.alltick.co/integration-process/universal-standard-header-description/websocket-common-standard-header
+    url: >-
+      https://en.apis.alltick.co/integration-process/universal-standard-header-description/websocket-common-standard-header
+- aid: alltick-api:alltick-api-quote-b-api-api
+  name: AllTick API Quote B API
+  description: The Quote B Api API from AllTick API — 4 operation(s) for quote b api.
+  humanURL: https://apis.alltick.co/en
+  baseURL: https://quote.alltick.co
+  tags:
+  - Quote B Api
+  properties:
+  - type: OpenAPI
+    url: openapi/alltick-api-quote-b-api-api-openapi.yml
+  - type: Documentation
+    url: https://apis.alltick.co/en
+  - type: APIReference
+    url: https://apis.alltick.co/en/api-reference/stock/kline
+  - type: GettingStarted
+    url: https://en.apis.alltick.co/integration-process/process-description
+  - type: LLMsTxt
+    url: https://en.apis.alltick.co/llms.txt
+  - type: DataModel
+    url: data-model/alltick-api-data-model.yml
+- aid: alltick-api:alltick-api-quote-stock-b-api-api
+  name: AllTick API Quote Stock B API
+  description: The Quote Stock B Api API from AllTick API — 5 operation(s) for quote stock b api.
+  humanURL: https://apis.alltick.co/en
+  baseURL: https://quote.alltick.co
+  tags:
+  - Quote Stock B Api
+  properties:
+  - type: OpenAPI
+    url: openapi/alltick-api-quote-stock-b-api-api-openapi.yml
+  - type: Documentation
+    url: https://apis.alltick.co/en
+  - type: APIReference
+    url: https://apis.alltick.co/en/api-reference/stock/kline
+  - type: GettingStarted
+    url: https://en.apis.alltick.co/integration-process/process-description
+  - type: LLMsTxt
+    url: https://en.apis.alltick.co/llms.txt
+  - type: DataModel
+    url: data-model/alltick-api-data-model.yml
+- aid: alltick-api:alltick-api-suspension-api
+  name: AllTick API Suspension API
+  description: The Suspension API from AllTick API — 3 operation(s) for suspension.
+  humanURL: https://apis.alltick.co/en
+  baseURL: https://quote.alltick.co
+  tags:
+  - Suspension
+  properties:
+  - type: OpenAPI
+    url: openapi/alltick-api-suspension-api-openapi.yml
+  - type: Documentation
+    url: https://apis.alltick.co/en
+  - type: APIReference
+    url: https://apis.alltick.co/en/api-reference/stock/kline
+  - type: GettingStarted
+    url: https://en.apis.alltick.co/integration-process/process-description
+  - type: LLMsTxt
+    url: https://en.apis.alltick.co/llms.txt
+  - type: DataModel
+    url: data-model/alltick-api-data-model.yml
 maintainers:
 - FN: AllTick
   email: support@alltick.co
@@ -132,6 +147,8 @@ generated:
   confidence: 90
   at: '2026-08-18T02:12:28.996Z'
 common:
+- type: Overlay
+  url: overlays/alltick-api-openapi-overlay.yaml
 - type: DomainSecurity
   url: security/alltick-api-domain-security.yml
 - type: DeveloperPortal
