@@ -8,6 +8,19 @@ description: AllTick (AllTick PTE. LTD., Singapore) sells real-time and historic
   listings; the WebSocket surface pushes tick-by-tick trades and order-book updates. Sold self-serve in
   USDT on a per-symbol-basket or whole-market basis, with a permanent free tier limited to ten demo symbols.
   Built for exchanges, brokers, quantitative teams, trading platforms and fintech developers.
+deliveryModel:
+  model: unknown
+  open_source: unknown
+  commercial: true
+  callable_host: true
+  label: Delivery model not determined — needs a product licence on record
+  confidence: low
+  source:
+  - openapi
+  - pricing
+  - repository-unlicensed
+  generated: '2026-08-28'
+  method: derived
 image: https://alltick.co/images/logo.png
 url: https://alltick-api.apievangelist.com/apis.yml
 created: '2026-08-18'
