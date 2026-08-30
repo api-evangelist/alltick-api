@@ -1,0 +1,358 @@
+openapi: 3.2.0
+info:
+  title: AllTick Market Data Quote B Quote B API
+  description: Real-time and historical market data API for stocks, forex, cryptocurrencies, and commodities.
+  version: 1.0.0
+servers:
+- url: https://quote.alltick.co
+  description: Production
+tags:
+- name: Quote B Api
+paths:
+  /quote-b-api/kline:
+    get:
+      operationId: getForexKline
+      summary: Forex/Crypto K-Line Query
+      description: Query historical K-line data for forex, cryptocurrency, precious metals, crude oil, and commodity products. Max 500 K-lines per request.
+      parameters:
+      - name: token
+        in: query
+        required: true
+        description: Your API authentication token
+        schema:
+          type: string
+          default: YOUR_TOKEN_HERE
+        example: YOUR_TOKEN_HERE
+      - name: query
+        in: query
+        required: true
+        description: URL-encoded JSON string containing trace and data fields.
+        schema:
+          type: string
+          default: '{"trace":"abc-123","data":{"code":"BTCUSDT","kline_type":1,"kline_timestamp_end":0,"query_kline_num":2,"adjust_type":0}}'
+        example: '{"trace":"abc-123","data":{"code":"BTCUSDT","kline_type":1,"kline_timestamp_end":0,"query_kline_num":2,"adjust_type":0}}'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KlineResponse'
+      tags:
+      - Quote B Api
+  /quote-b-api/batch-kline:
+    post:
+      operationId: postForexBatchKline
+      summary: Forex/Crypto Batch K-Line Query
+      description: Batch query latest 2 K-lines for multiple forex, crypto, or commodity products.
+      parameters:
+      - name: token
+        in: query
+        required: true
+        description: Your API authentication token
+        schema:
+          type: string
+          default: YOUR_TOKEN_HERE
+        example: YOUR_TOKEN_HERE
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BatchKlineRequest'
+            example:
+              trace: abc-123
+              data:
+                data_list:
+                - code: BTCUSDT
+                  kline_type: 1
+                  kline_timestamp_end: 0
+                  query_kline_num: 2
+                  adjust_type: 0
+                - code: ETHUSDT
+                  kline_type: 8
+                  kline_timestamp_end: 0
+                  query_kline_num: 2
+                  adjust_type: 0
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BatchKlineResponse'
+      tags:
+      - Quote B Api
+  /quote-b-api/depth-tick:
+    get:
+      operationId: getForexDepthTick
+      summary: Forex/Crypto Order Book Query
+      description: Query latest order book data for forex, crypto, precious metals, and commodity products.
+      parameters:
+      - name: token
+        in: query
+        required: true
+        description: Your API authentication token
+        schema:
+          type: string
+          default: YOUR_TOKEN_HERE
+        example: YOUR_TOKEN_HERE
+      - name: query
+        in: query
+        required: true
+        description: URL-encoded JSON string containing trace and symbol_list.
+        schema:
+          type: string
+          default: '{"trace":"abc-123","data":{"symbol_list":[{"code":"BTCUSDT"},{"code":"ETHUSDT"}]}}'
+        example: '{"trace":"abc-123","data":{"symbol_list":[{"code":"BTCUSDT"},{"code":"ETHUSDT"}]}}'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DepthTickResponse'
+      tags:
+      - Quote B Api
+  /quote-b-api/trade-tick:
+    get:
+      operationId: getForexTradeTick
+      summary: Forex/Crypto Latest Trade Query
+      description: Query latest trade price for forex, crypto, precious metals, and commodity products.
+      parameters:
+      - name: token
+        in: query
+        required: true
+        description: Your API authentication token
+        schema:
+          type: string
+          default: YOUR_TOKEN_HERE
+        example: YOUR_TOKEN_HERE
+      - name: query
+        in: query
+        required: true
+        description: URL-encoded JSON string containing trace and symbol_list.
+        schema:
+          type: string
+          default: '{"trace":"abc-123","data":{"symbol_list":[{"code":"BTCUSDT"},{"code":"ETHUSDT"}]}}'
+        example: '{"trace":"abc-123","data":{"symbol_list":[{"code":"BTCUSDT"},{"code":"ETHUSDT"}]}}'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TradeTickResponse'
+      tags:
+      - Quote B Api
+components:
+  schemas:
+    BatchKlineResponse:
+      type: object
+      properties:
+        ret:
+          type: integer
+        msg:
+          type: string
+        trace:
+          type: string
+        data:
+          type: object
+          properties:
+            kline_list:
+              type: array
+              items:
+                type: object
+                properties:
+                  code:
+                    type: string
+                  kline_type:
+                    type: integer
+                  kline_data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        timestamp:
+                          type: string
+                        open_price:
+                          type: string
+                        close_price:
+                          type: string
+                        high_price:
+                          type: string
+                        low_price:
+                          type: string
+                        volume:
+                          type: string
+                        turnover:
+                          type: string
+    KlineResponse:
+      type: object
+      properties:
+        ret:
+          type: integer
+          description: Return code (200 = success)
+        msg:
+          type: string
+          description: Response message
+        trace:
+          type: string
+          description: Request trace ID
+        data:
+          type: object
+          properties:
+            code:
+              type: string
+              description: Product code
+            kline_type:
+              type: integer
+              description: K-line type (1=1min, 2=5min, 3=15min, 4=30min, 5=1hour, 6=2hour, 7=4hour, 8=daily, 9=weekly, 10=monthly)
+            kline_list:
+              type: array
+              items:
+                type: object
+                properties:
+                  timestamp:
+                    type: string
+                    description: K-line timestamp
+                  open_price:
+                    type: string
+                    description: Open price
+                  close_price:
+                    type: string
+                    description: Close price
+                  high_price:
+                    type: string
+                    description: High price
+                  low_price:
+                    type: string
+                    description: Low price
+                  volume:
+                    type: string
+                    description: Volume
+                  turnover:
+                    type: string
+                    description: Turnover
+    BatchKlineRequest:
+      type: object
+      required:
+      - trace
+      - data
+      properties:
+        trace:
+          type: string
+          description: Unique trace ID for request tracking
+        data:
+          type: object
+          required:
+          - data_list
+          properties:
+            data_list:
+              type: array
+              items:
+                type: object
+                required:
+                - code
+                - kline_type
+                - kline_timestamp_end
+                - query_kline_num
+                - adjust_type
+                properties:
+                  code:
+                    type: string
+                    description: Product code
+                  kline_type:
+                    type: integer
+                    description: K-line type (1=1min, 2=5min, 3=15min, 4=30min, 5=1hour, 6=2hour, 7=4hour, 8=daily, 9=weekly, 10=monthly)
+                  kline_timestamp_end:
+                    type: integer
+                    description: End timestamp (0 = latest)
+                  query_kline_num:
+                    type: integer
+                    description: Number of K-lines to query (max 2 for batch)
+                  adjust_type:
+                    type: integer
+                    description: Adjustment type (0=ex-rights, 1=forward-adjusted)
+    TradeTickResponse:
+      type: object
+      properties:
+        ret:
+          type: integer
+        msg:
+          type: string
+        trace:
+          type: string
+        data:
+          type: object
+          properties:
+            tick_list:
+              type: array
+              items:
+                type: object
+                properties:
+                  code:
+                    type: string
+                    description: Product code
+                  seq:
+                    type: string
+                    description: Sequence number
+                  tick_time:
+                    type: string
+                    description: Timestamp (ms)
+                  price:
+                    type: string
+                    description: Trade price
+                  volume:
+                    type: string
+                    description: Trade volume
+                  turnover:
+                    type: string
+                    description: Trade turnover
+                  trade_direction:
+                    type: integer
+                    description: Trade direction (0=neutral, 1=buy, 2=sell)
+    DepthTickResponse:
+      type: object
+      properties:
+        ret:
+          type: integer
+        msg:
+          type: string
+        trace:
+          type: string
+        data:
+          type: object
+          properties:
+            tick_list:
+              type: array
+              items:
+                type: object
+                properties:
+                  code:
+                    type: string
+                    description: Product code
+                  seq:
+                    type: string
+                    description: Quote sequence number
+                  tick_time:
+                    type: string
+                    description: Quote timestamp (ms)
+                  bids:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        price:
+                          type: string
+                        volume:
+                          type: string
+                  asks:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        price:
+                          type: string
+                        volume:
+                          type: string

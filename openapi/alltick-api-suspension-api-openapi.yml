@@ -1,0 +1,128 @@
+openapi: 3.2.0
+info:
+  title: AllTick Market Data Suspension API
+  description: Real-time and historical market data API for stocks, forex, cryptocurrencies, and commodities.
+  version: 1.0.0
+servers:
+- url: https://quote.alltick.co
+  description: Production
+tags:
+- name: Suspension
+paths:
+  /api/suspension/sse:
+    get:
+      operationId: getSseSuspension
+      summary: SSE Suspension Query
+      description: Get all suspension and resumption information from the Shanghai Stock Exchange (SSE).
+      parameters:
+      - name: token
+        in: query
+        required: true
+        description: User subscription token
+        schema:
+          type: string
+          default: YOUR_TOKEN_HERE
+        example: YOUR_TOKEN_HERE
+      - name: page
+        in: query
+        required: false
+        description: Query page number
+        schema:
+          type: integer
+          default: 1
+        example: 1
+      - name: size
+        in: query
+        required: false
+        description: Page size
+        schema:
+          type: integer
+          default: 10
+        example: 10
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+      tags:
+      - Suspension
+  /api/suspension/nyse:
+    get:
+      operationId: getNyseSuspension
+      summary: NYSE Suspension Query
+      description: Get all suspension and resumption information from the New York Stock Exchange (NYSE).
+      parameters:
+      - name: token
+        in: query
+        required: true
+        description: User subscription token
+        schema:
+          type: string
+          default: YOUR_TOKEN_HERE
+        example: YOUR_TOKEN_HERE
+      - name: page
+        in: query
+        required: false
+        description: Query page number
+        schema:
+          type: integer
+          default: 1
+        example: 1
+      - name: size
+        in: query
+        required: false
+        description: Page size
+        schema:
+          type: integer
+          default: 10
+        example: 10
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+      tags:
+      - Suspension
+  /api/suspension/nasdaq:
+    get:
+      operationId: getNasdaqSuspension
+      summary: NASDAQ Suspension Query
+      description: Get all suspension and resumption information from NASDAQ.
+      parameters:
+      - name: token
+        in: query
+        required: true
+        description: User subscription token
+        schema:
+          type: string
+          default: YOUR_TOKEN_HERE
+        example: YOUR_TOKEN_HERE
+      - name: page
+        in: query
+        required: false
+        description: Query page number
+        schema:
+          type: integer
+          default: 1
+        example: 1
+      - name: size
+        in: query
+        required: false
+        description: Page size
+        schema:
+          type: integer
+          default: 10
+        example: 10
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+      tags:
+      - Suspension
