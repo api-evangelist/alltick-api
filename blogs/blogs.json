@@ -9,13 +9,17 @@
       "method": "none"
     },
     {
+      "source": "https://blog.alltick.co/feed/",
+      "error": "HTTPError"
+    },
+    {
       "source": "https://blog.alltick.co/",
-      "feed_url": "https://blog.alltick.co/feed/",
+      "feed_url": "https://blog.alltick.co/",
       "title": "",
-      "saved": 1,
-      "method": "discovered"
+      "saved": 0,
+      "method": "none"
     }
   ],
   "post_count": 1,
-  "fetched": "2026-08-22T20:20:02Z"
+  "fetched": "2026-08-30T22:33:40Z"
 }
