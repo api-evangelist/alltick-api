@@ -27,16 +27,16 @@ created: '2026-08-18'
 modified: '2026-08-18'
 specificationVersion: '0.23'
 tags:
-- financial-market-data
-- real-time-data
+- Financial market data
+- Real-Time Data
 - stock-market-data
 - forex-data
 - Cryptocurrency Data
 - commodities-data
-- tick-data
+- Tick Data
 - websocket-streaming
 - Fintech
-- quantitative-trading
+- Quantitative Trading
 - market-data-api
 - trading-halts
 tags_raw:
@@ -63,16 +63,16 @@ apis:
   humanURL: https://en.apis.alltick.co/websocket-api/websocket-interface-api
   baseURL: wss://quote.alltick.co
   tags:
-  - financial-market-data
-  - real-time-data
+  - Financial market data
+  - Real-Time Data
   - websocket-streaming
-  - tick-data
+  - Tick Data
   - stock-market-data
   - forex-data
   - Cryptocurrency Data
   - commodities-data
   - Fintech
-  - quantitative-trading
+  - Quantitative Trading
   tags_raw:
   - financial-market-data
   - real-time-data
