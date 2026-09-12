@@ -176,6 +176,8 @@ generated:
   confidence: 90
   at: '2026-08-18T02:12:28.996Z'
 common:
+- type: Website
+  url: https://www.alltick.co/
 - type: Overlay
   url: overlays/alltick-api-openapi-overlay.yaml
 - type: DomainSecurity
