@@ -53,7 +53,7 @@ tags:
 - Cryptocurrency Data
 - commodities-data
 - Tick Data
-- websocket-streaming
+- WebSocket streaming
 - Fintech
 - Quantitative Trading
 - market-data-api
@@ -84,7 +84,7 @@ apis:
   tags:
   - Financial market data
   - Real-Time Data
-  - websocket-streaming
+  - WebSocket streaming
   - Tick Data
   - stock-market-data
   - forex-data
