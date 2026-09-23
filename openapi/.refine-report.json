@@ -1,0 +1,39 @@
+{
+  "provider": "alltick-api",
+  "sources": [
+    "_original/alltick-api-openapi.json"
+  ],
+  "outputs": [
+    "alltick-api-quote-b-api-api-openapi.yml",
+    "alltick-api-quote-stock-b-api-api-openapi.yml",
+    "alltick-api-suspension-api-openapi.yml"
+  ],
+  "archived": [],
+  "errors": [],
+  "warnings": [],
+  "notes": [
+    "sourced from openapi/_original/ (1 archived document(s)); previously refined output at the top level was skipped rather than re-split",
+    "alltick-api-openapi.json: upgraded openapi 3.1.0 -> OpenAPI 3.2.0",
+    "alltick-api-openapi.json: tagged paths GET /quote-stock-b-api/kline -> Quote Stock B Api",
+    "alltick-api-openapi.json: tagged paths GET /quote-b-api/kline -> Quote B Api",
+    "alltick-api-openapi.json: tagged paths POST /quote-stock-b-api/batch-kline -> Quote Stock B Api",
+    "alltick-api-openapi.json: tagged paths POST /quote-b-api/batch-kline -> Quote B Api",
+    "alltick-api-openapi.json: tagged paths GET /quote-stock-b-api/depth-tick -> Quote Stock B Api",
+    "alltick-api-openapi.json: tagged paths GET /quote-b-api/depth-tick -> Quote B Api",
+    "alltick-api-openapi.json: tagged paths GET /quote-stock-b-api/trade-tick -> Quote Stock B Api",
+    "alltick-api-openapi.json: tagged paths GET /quote-b-api/trade-tick -> Quote B Api",
+    "alltick-api-openapi.json: tagged paths GET /quote-stock-b-api/static_info -> Quote Stock B Api",
+    "alltick-api-openapi.json: tagged paths GET /api/suspension/sse -> Suspension",
+    "alltick-api-openapi.json: tagged paths GET /api/suspension/nyse -> Suspension",
+    "alltick-api-openapi.json: tagged paths GET /api/suspension/nasdaq -> Suspension",
+    "alltick-api-openapi.json: declared missing tag: Quote B Api",
+    "alltick-api-openapi.json: declared missing tag: Quote Stock B Api",
+    "alltick-api-openapi.json: declared missing tag: Suspension",
+    "apis.yml register: already-registered"
+  ],
+  "skipped": [
+    "alltick-api-quote-b-api-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "alltick-api-quote-stock-b-api-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "alltick-api-suspension-api-openapi.yml: previously refined output, superseded by openapi/_original/"
+  ]
+}

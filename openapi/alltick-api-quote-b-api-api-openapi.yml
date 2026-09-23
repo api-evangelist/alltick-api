@@ -1,6 +1,6 @@
 openapi: 3.2.0
 info:
-  title: AllTick Market Data Quote B Quote B API
+  title: AllTick Market Data Quote B API
   description: Real-time and historical market data API for stocks, forex, cryptocurrencies, and commodities.
   version: 1.0.0
 servers:
@@ -147,7 +147,47 @@ paths:
       - Quote B Api
 components:
   schemas:
-    BatchKlineResponse:
+    BatchKlineRequest:
+      type: object
+      required:
+      - trace
+      - data
+      properties:
+        trace:
+          type: string
+          description: Unique trace ID for request tracking
+        data:
+          type: object
+          required:
+          - data_list
+          properties:
+            data_list:
+              type: array
+              items:
+                type: object
+                required:
+                - code
+                - kline_type
+                - kline_timestamp_end
+                - query_kline_num
+                - adjust_type
+                properties:
+                  code:
+                    type: string
+                    description: Product code
+                  kline_type:
+                    type: integer
+                    description: K-line type (1=1min, 2=5min, 3=15min, 4=30min, 5=1hour, 6=2hour, 7=4hour, 8=daily, 9=weekly, 10=monthly)
+                  kline_timestamp_end:
+                    type: integer
+                    description: End timestamp (0 = latest)
+                  query_kline_num:
+                    type: integer
+                    description: Number of K-lines to query (max 2 for batch)
+                  adjust_type:
+                    type: integer
+                    description: Adjustment type (0=ex-rights, 1=forward-adjusted)
+    DepthTickResponse:
       type: object
       properties:
         ret:
@@ -159,34 +199,76 @@ components:
         data:
           type: object
           properties:
-            kline_list:
+            tick_list:
               type: array
               items:
                 type: object
                 properties:
                   code:
                     type: string
-                  kline_type:
-                    type: integer
-                  kline_data:
+                    description: Product code
+                  seq:
+                    type: string
+                    description: Quote sequence number
+                  tick_time:
+                    type: string
+                    description: Quote timestamp (ms)
+                  bids:
                     type: array
                     items:
                       type: object
                       properties:
-                        timestamp:
-                          type: string
-                        open_price:
-                          type: string
-                        close_price:
-                          type: string
-                        high_price:
-                          type: string
-                        low_price:
+                        price:
                           type: string
                         volume:
                           type: string
-                        turnover:
+                  asks:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        price:
                           type: string
+                        volume:
+                          type: string
+    TradeTickResponse:
+      type: object
+      properties:
+        ret:
+          type: integer
+        msg:
+          type: string
+        trace:
+          type: string
+        data:
+          type: object
+          properties:
+            tick_list:
+              type: array
+              items:
+                type: object
+                properties:
+                  code:
+                    type: string
+                    description: Product code
+                  seq:
+                    type: string
+                    description: Sequence number
+                  tick_time:
+                    type: string
+                    description: Timestamp (ms)
+                  price:
+                    type: string
+                    description: Trade price
+                  volume:
+                    type: string
+                    description: Trade volume
+                  turnover:
+                    type: string
+                    description: Trade turnover
+                  trade_direction:
+                    type: integer
+                    description: Trade direction (0=neutral, 1=buy, 2=sell)
     KlineResponse:
       type: object
       properties:
@@ -234,125 +316,43 @@ components:
                   turnover:
                     type: string
                     description: Turnover
-    BatchKlineRequest:
+    BatchKlineResponse:
       type: object
-      required:
-      - trace
-      - data
       properties:
+        ret:
+          type: integer
+        msg:
+          type: string
         trace:
           type: string
-          description: Unique trace ID for request tracking
         data:
           type: object
-          required:
-          - data_list
           properties:
-            data_list:
+            kline_list:
               type: array
               items:
                 type: object
-                required:
-                - code
-                - kline_type
-                - kline_timestamp_end
-                - query_kline_num
-                - adjust_type
                 properties:
                   code:
                     type: string
-                    description: Product code
                   kline_type:
                     type: integer
-                    description: K-line type (1=1min, 2=5min, 3=15min, 4=30min, 5=1hour, 6=2hour, 7=4hour, 8=daily, 9=weekly, 10=monthly)
-                  kline_timestamp_end:
-                    type: integer
-                    description: End timestamp (0 = latest)
-                  query_kline_num:
-                    type: integer
-                    description: Number of K-lines to query (max 2 for batch)
-                  adjust_type:
-                    type: integer
-                    description: Adjustment type (0=ex-rights, 1=forward-adjusted)
-    TradeTickResponse:
-      type: object
-      properties:
-        ret:
-          type: integer
-        msg:
-          type: string
-        trace:
-          type: string
-        data:
-          type: object
-          properties:
-            tick_list:
-              type: array
-              items:
-                type: object
-                properties:
-                  code:
-                    type: string
-                    description: Product code
-                  seq:
-                    type: string
-                    description: Sequence number
-                  tick_time:
-                    type: string
-                    description: Timestamp (ms)
-                  price:
-                    type: string
-                    description: Trade price
-                  volume:
-                    type: string
-                    description: Trade volume
-                  turnover:
-                    type: string
-                    description: Trade turnover
-                  trade_direction:
-                    type: integer
-                    description: Trade direction (0=neutral, 1=buy, 2=sell)
-    DepthTickResponse:
-      type: object
-      properties:
-        ret:
-          type: integer
-        msg:
-          type: string
-        trace:
-          type: string
-        data:
-          type: object
-          properties:
-            tick_list:
-              type: array
-              items:
-                type: object
-                properties:
-                  code:
-                    type: string
-                    description: Product code
-                  seq:
-                    type: string
-                    description: Quote sequence number
-                  tick_time:
-                    type: string
-                    description: Quote timestamp (ms)
-                  bids:
+                  kline_data:
                     type: array
                     items:
                       type: object
                       properties:
-                        price:
+                        timestamp:
+                          type: string
+                        open_price:
+                          type: string
+                        close_price:
+                          type: string
+                        high_price:
+                          type: string
+                        low_price:
                           type: string
                         volume:
                           type: string
-                  asks:
-                    type: array
-                    items:
-                      type: object
-                      properties:
-                        price:
-                          type: string
-                        volume:
+                        turnover:
                           type: string
