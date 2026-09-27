@@ -9,17 +9,20 @@ description: AllTick (AllTick PTE. LTD., Singapore) sells real-time and historic
   USDT on a per-symbol-basket or whole-market basis, with a permanent free tier limited to ten demo symbols.
   Built for exchanges, brokers, quantitative teams, trading platforms and fintech developers.
 deliveryModel:
-  model: unknown
+  model: saas
+  license_evidence:
+    not_product:
+    - alltick/alltick-realtime-forex-crypto-stock-tick-finance-websocket-api
   open_source: unknown
   commercial: true
   callable_host: true
-  label: Delivery model not determined — needs a product licence on record
+  label: Hosted service · you call their endpoint
   confidence: low
   source:
   - openapi
   - pricing
-  - repository-unlicensed
-  generated: '2026-08-28'
+  - repository-not-product
+  generated: '2026-09-25'
   method: derived
 accessModel:
   pricing: freemium

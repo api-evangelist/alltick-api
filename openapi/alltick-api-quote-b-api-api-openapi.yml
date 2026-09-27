@@ -147,6 +147,131 @@ paths:
       - Quote B Api
 components:
   schemas:
+    TradeTickResponse:
+      type: object
+      properties:
+        ret:
+          type: integer
+        msg:
+          type: string
+        trace:
+          type: string
+        data:
+          type: object
+          properties:
+            tick_list:
+              type: array
+              items:
+                type: object
+                properties:
+                  code:
+                    type: string
+                    description: Product code
+                  seq:
+                    type: string
+                    description: Sequence number
+                  tick_time:
+                    type: string
+                    description: Timestamp (ms)
+                  price:
+                    type: string
+                    description: Trade price
+                  volume:
+                    type: string
+                    description: Trade volume
+                  turnover:
+                    type: string
+                    description: Trade turnover
+                  trade_direction:
+                    type: integer
+                    description: Trade direction (0=neutral, 1=buy, 2=sell)
+    BatchKlineResponse:
+      type: object
+      properties:
+        ret:
+          type: integer
+        msg:
+          type: string
+        trace:
+          type: string
+        data:
+          type: object
+          properties:
+            kline_list:
+              type: array
+              items:
+                type: object
+                properties:
+                  code:
+                    type: string
+                  kline_type:
+                    type: integer
+                  kline_data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        timestamp:
+                          type: string
+                        open_price:
+                          type: string
+                        close_price:
+                          type: string
+                        high_price:
+                          type: string
+                        low_price:
+                          type: string
+                        volume:
+                          type: string
+                        turnover:
+                          type: string
+    KlineResponse:
+      type: object
+      properties:
+        ret:
+          type: integer
+          description: Return code (200 = success)
+        msg:
+          type: string
+          description: Response message
+        trace:
+          type: string
+          description: Request trace ID
+        data:
+          type: object
+          properties:
+            code:
+              type: string
+              description: Product code
+            kline_type:
+              type: integer
+              description: K-line type (1=1min, 2=5min, 3=15min, 4=30min, 5=1hour, 6=2hour, 7=4hour, 8=daily, 9=weekly, 10=monthly)
+            kline_list:
+              type: array
+              items:
+                type: object
+                properties:
+                  timestamp:
+                    type: string
+                    description: K-line timestamp
+                  open_price:
+                    type: string
+                    description: Open price
+                  close_price:
+                    type: string
+                    description: Close price
+                  high_price:
+                    type: string
+                    description: High price
+                  low_price:
+                    type: string
+                    description: Low price
+                  volume:
+                    type: string
+                    description: Volume
+                  turnover:
+                    type: string
+                    description: Turnover
     BatchKlineRequest:
       type: object
       required:
@@ -230,129 +355,4 @@ components:
                         price:
                           type: string
                         volume:
-                          type: string
-    TradeTickResponse:
-      type: object
-      properties:
-        ret:
-          type: integer
-        msg:
-          type: string
-        trace:
-          type: string
-        data:
-          type: object
-          properties:
-            tick_list:
-              type: array
-              items:
-                type: object
-                properties:
-                  code:
-                    type: string
-                    description: Product code
-                  seq:
-                    type: string
-                    description: Sequence number
-                  tick_time:
-                    type: string
-                    description: Timestamp (ms)
-                  price:
-                    type: string
-                    description: Trade price
-                  volume:
-                    type: string
-                    description: Trade volume
-                  turnover:
-                    type: string
-                    description: Trade turnover
-                  trade_direction:
-                    type: integer
-                    description: Trade direction (0=neutral, 1=buy, 2=sell)
-    KlineResponse:
-      type: object
-      properties:
-        ret:
-          type: integer
-          description: Return code (200 = success)
-        msg:
-          type: string
-          description: Response message
-        trace:
-          type: string
-          description: Request trace ID
-        data:
-          type: object
-          properties:
-            code:
-              type: string
-              description: Product code
-            kline_type:
-              type: integer
-              description: K-line type (1=1min, 2=5min, 3=15min, 4=30min, 5=1hour, 6=2hour, 7=4hour, 8=daily, 9=weekly, 10=monthly)
-            kline_list:
-              type: array
-              items:
-                type: object
-                properties:
-                  timestamp:
-                    type: string
-                    description: K-line timestamp
-                  open_price:
-                    type: string
-                    description: Open price
-                  close_price:
-                    type: string
-                    description: Close price
-                  high_price:
-                    type: string
-                    description: High price
-                  low_price:
-                    type: string
-                    description: Low price
-                  volume:
-                    type: string
-                    description: Volume
-                  turnover:
-                    type: string
-                    description: Turnover
-    BatchKlineResponse:
-      type: object
-      properties:
-        ret:
-          type: integer
-        msg:
-          type: string
-        trace:
-          type: string
-        data:
-          type: object
-          properties:
-            kline_list:
-              type: array
-              items:
-                type: object
-                properties:
-                  code:
-                    type: string
-                  kline_type:
-                    type: integer
-                  kline_data:
-                    type: array
-                    items:
-                      type: object
-                      properties:
-                        timestamp:
-                          type: string
-                        open_price:
-                          type: string
-                        close_price:
-                          type: string
-                        high_price:
-                          type: string
-                        low_price:
-                          type: string
-                        volume:
-                          type: string
-                        turnover:
                           type: string
